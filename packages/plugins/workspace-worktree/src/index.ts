@@ -49,6 +49,16 @@ async function refExists(cwd: string, ref: string): Promise<boolean> {
   }
 }
 
+async function getCurrentBranch(repoPath: string): Promise<string | null> {
+  try {
+    const branch = await git(repoPath, "rev-parse", "--abbrev-ref", "HEAD");
+    if (!branch || branch === "HEAD") return null;
+    return branch.trim();
+  } catch {
+    return null;
+  }
+}
+
 async function resolveBaseRef(
   repoPath: string,
   defaultBranch: string,
@@ -72,6 +82,31 @@ async function resolveBaseRef(
   for (const candidate of candidates) {
     const localDefaultBranch = `refs/heads/${candidate}`;
     if (await refExists(repoPath, localDefaultBranch)) return localDefaultBranch;
+  }
+
+  if (hasOrigin) {
+    try {
+      const remoteUrl = await git(repoPath, "remote", "get-url", "origin");
+      if (remoteUrl) {
+        const remoteDefault = await resolveRemoteDefaultBranch(remoteUrl, candidates);
+        if (remoteDefault) {
+          const remoteRef = `origin/${remoteDefault}`;
+          if (await refExists(repoPath, remoteRef)) return remoteRef;
+          const localRef = `refs/heads/${remoteDefault}`;
+          if (await refExists(repoPath, localRef)) return localRef;
+        }
+      }
+    } catch {
+      // Ignore and fall back to current branch
+    }
+  }
+
+  const headBranch = await getCurrentBranch(repoPath);
+  if (headBranch) {
+    const remoteHead = `origin/${headBranch}`;
+    if (hasOrigin && (await refExists(repoPath, remoteHead))) return remoteHead;
+    const localHead = `refs/heads/${headBranch}`;
+    if (await refExists(repoPath, localHead)) return localHead;
   }
 
   throw new Error(
