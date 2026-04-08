@@ -54,6 +54,7 @@
     "@moakbal/mao-plugin-tracker-jira": "workspace:*",
     "@moakbal/mao-plugin-tracker-linear": "workspace:*",
     "@moakbal/mao-plugin-workspace-clone": "workspace:*",
+    "@moakbal/mao-plugin-workspace-direct": "workspace:*",
     "@moakbal/mao-plugin-workspace-worktree": "workspace:*",
     "@moakbal/mao-web": "workspace:*",
     "chalk": "^5.4.0",

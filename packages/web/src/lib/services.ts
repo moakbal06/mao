@@ -41,6 +41,7 @@ import pluginRuntimeTmux from "@moakbal/mao-plugin-runtime-tmux";
 import pluginAgentClaudeCode from "@moakbal/mao-plugin-agent-claude-code";
 import pluginAgentOpencode from "@moakbal/mao-plugin-agent-opencode";
 import pluginWorkspaceWorktree from "@moakbal/mao-plugin-workspace-worktree";
+import pluginWorkspaceDirect from "@moakbal/mao-plugin-workspace-direct";
 import pluginScmGithub from "@moakbal/mao-plugin-scm-github";
 import pluginTrackerGithub from "@moakbal/mao-plugin-tracker-github";
 import pluginTrackerJira from "@moakbal/mao-plugin-tracker-jira";
@@ -100,6 +101,7 @@ async function initServices(): Promise<Services> {
   registry.register(pluginAgentClaudeCode);
   registry.register(pluginAgentOpencode);
   registry.register(pluginWorkspaceWorktree);
+  registry.register(pluginWorkspaceDirect);
   registry.register(pluginScmGithub);
   registry.register(pluginTrackerGithub);
   registry.register(pluginTrackerJira);

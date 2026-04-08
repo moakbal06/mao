@@ -42,6 +42,7 @@ const BUILTIN_PLUGINS: Array<{ slot: PluginSlot; name: string; pkg: string }> = 
   // Workspaces
   { slot: "workspace", name: "worktree", pkg: "@moakbal/mao-plugin-workspace-worktree" },
   { slot: "workspace", name: "clone", pkg: "@moakbal/mao-plugin-workspace-clone" },
+  { slot: "workspace", name: "direct", pkg: "@moakbal/mao-plugin-workspace-direct" },
   // Trackers
   { slot: "tracker", name: "github", pkg: "@moakbal/mao-plugin-tracker-github" },
   { slot: "tracker", name: "linear", pkg: "@moakbal/mao-plugin-tracker-linear" },

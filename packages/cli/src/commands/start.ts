@@ -67,6 +67,7 @@ import { findProjectForDirectory } from "../lib/project-resolution.js";
 
 const DEFAULT_PORT = 3000;
 const IS_TTY = Boolean(process.stdin.isTTY && process.stdout.isTTY);
+type WorkspaceMode = "worktree" | "direct";
 
 // =============================================================================
 // HELPERS
@@ -373,6 +374,37 @@ async function ensureJiraConfig(
   }
 
   return { config, project };
+}
+
+async function promptWorkspaceMode(initial: WorkspaceMode = "worktree"): Promise<WorkspaceMode> {
+  if (!IS_TTY) return initial;
+
+  const mode = await promptSelect<WorkspaceMode>(
+    "Where should agent sessions work?",
+    [
+      {
+        value: "worktree",
+        label: "Isolated worktree (recommended)",
+        hint: "Creates per-task folders under ~/.worktrees",
+      },
+      {
+        value: "direct",
+        label: "Direct repo folder",
+        hint: "Edits project.path directly (best for one session at a time)",
+      },
+    ],
+    initial,
+  );
+
+  if (mode === "direct") {
+    console.log(
+      chalk.yellow(
+        "  ⚠ Direct mode edits the cloned repo folder directly. Avoid running multiple sessions in parallel.",
+      ),
+    );
+  }
+
+  return mode;
 }
 
 async function ensureRequiredEnv(
@@ -739,6 +771,7 @@ async function handleUrlStart(
   }
 
   // 5. Auto-generate config with a free port
+  const workspaceMode = await promptWorkspaceMode("worktree");
   spinner.start("Generating config");
   const freePort = await findFreePort(DEFAULT_PORT);
   const rawConfig = generateConfigFromUrl({
@@ -746,6 +779,9 @@ async function handleUrlStart(
     repoPath: targetDir,
     port: freePort ?? DEFAULT_PORT,
   });
+  const defaults = (rawConfig["defaults"] ?? {}) as Record<string, unknown>;
+  defaults["workspace"] = workspaceMode;
+  rawConfig["defaults"] = defaults;
 
   const yamlContent = configToYaml(rawConfig);
   writeFileSync(configPath, yamlContent);
@@ -788,6 +824,7 @@ async function autoCreateConfig(workingDir: string): Promise<OrchestratorConfig>
   console.log();
 
   const agentRules = generateRulesFromTemplates(projectType);
+  const workspaceMode = await promptWorkspaceMode("worktree");
 
   // Build config with smart defaults
   const projectId = env.isGitRepo ? basename(workingDir) : "my-project";
@@ -829,7 +866,7 @@ async function autoCreateConfig(workingDir: string): Promise<OrchestratorConfig>
     defaults: {
       runtime: "tmux",
       agent,
-      workspace: "worktree",
+      workspace: workspaceMode,
       notifiers: [],
     },
     projects: {

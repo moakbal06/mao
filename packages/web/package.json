@@ -35,6 +35,7 @@
     "@moakbal/mao-plugin-tracker-github": "workspace:*",
     "@moakbal/mao-plugin-tracker-jira": "workspace:*",
     "@moakbal/mao-plugin-tracker-linear": "workspace:*",
+    "@moakbal/mao-plugin-workspace-direct": "workspace:*",
     "@moakbal/mao-plugin-workspace-worktree": "workspace:*",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/addon-web-links": "^0.12.0",
