@@ -109,6 +109,16 @@ async function resolveBaseRef(
     if (await refExists(repoPath, localHead)) return localHead;
   }
 
+  // Final fallback: use current HEAD commit.
+  // This avoids hard failure when default branch cannot be resolved
+  // (e.g., non-standard default branches or missing remote refs).
+  try {
+    await git(repoPath, "rev-parse", "--verify", "HEAD");
+    return "HEAD";
+  } catch {
+    // Fall through to error below
+  }
+
   throw new Error(
     `Unable to resolve base ref for default branches: ${candidates.join(", ")}`,
   );
