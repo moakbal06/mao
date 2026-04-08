@@ -588,7 +588,7 @@ function applyDefaultReactions(config: OrchestratorConfig): OrchestratorConfig {
       auto: true,
       action: "send-to-agent",
       message:
-        "You appear to be idle. If your task is not complete, continue working — write the code, commit, push, and create a PR. If you are blocked, explain what is blocking you.",
+        "You appear to be idle. If implementation is done and commits are pushed, open the PR now (`gh pr create --fill`) and share the PR link. If not done, continue coding. If blocked, explain the blocker.",
       retries: 2,
       escalateAfter: "15m",
     },

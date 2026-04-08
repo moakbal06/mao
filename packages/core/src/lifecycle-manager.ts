@@ -110,6 +110,8 @@ function statusToEventType(_from: SessionStatus | undefined, to: SessionStatus):
   switch (to) {
     case "working":
       return "session.working";
+    case "idle":
+      return "session.idle";
     case "pr_open":
       return "pr.created";
     case "ci_failed":
@@ -152,6 +154,8 @@ function eventToReactionKey(eventType: EventType): string | null {
       return "approved-and-green";
     case "session.stuck":
       return "agent-stuck";
+    case "session.idle":
+      return "agent-idle";
     case "session.needs_input":
       return "agent-needs-input";
     case "session.killed":
@@ -549,6 +553,9 @@ export function createLifecycleManager(deps: LifecycleManagerDeps): LifecycleMan
     // still check stuck threshold. This handles agents that finish without creating a PR.
     if (detectedIdleTimestamp && isIdleBeyondThreshold(session, detectedIdleTimestamp)) {
       return "stuck";
+    }
+    if (detectedIdleTimestamp) {
+      return "idle";
     }
 
     // 6. Default: if agent is active, it's working

@@ -201,6 +201,25 @@ describe("check (single session)", () => {
     expect(lm.getStates().get("app-1")).toBe("needs_input");
   });
 
+  it("transitions to idle when agent reports idle below stuck threshold", async () => {
+    config.reactions = {
+      "agent-stuck": { auto: true, action: "notify", threshold: "10m" },
+    };
+
+    vi.mocked(plugins.agent.getActivityState).mockResolvedValue({
+      state: "idle",
+      timestamp: new Date(Date.now() - 120_000),
+    });
+
+    const lm = setupCheck("app-1", {
+      session: makeSession({ status: "working", metadata: { agent: "mock-agent" } }),
+      metaOverrides: { agent: "mock-agent" },
+    });
+
+    await lm.check("app-1");
+    expect(lm.getStates().get("app-1")).toBe("idle");
+  });
+
   it("transitions to stuck when idle exceeds agent-stuck threshold (OpenCode-style activity)", async () => {
     config.reactions = {
       "agent-stuck": { auto: true, action: "notify", threshold: "1m" },
@@ -536,6 +555,31 @@ describe("reactions", () => {
 
     await lm.check("app-1");
     expect(mockSessionManager.send).toHaveBeenCalledWith("app-1", "CI is failing. Fix it.");
+  });
+
+  it("triggers send-to-agent reaction on idle transition", async () => {
+    config.reactions = {
+      "agent-idle": {
+        auto: true,
+        action: "send-to-agent",
+        message: "Open the PR now.",
+      },
+      "agent-stuck": { auto: true, action: "notify", threshold: "10m" },
+    };
+
+    vi.mocked(plugins.agent.getActivityState).mockResolvedValue({
+      state: "idle",
+      timestamp: new Date(Date.now() - 120_000),
+    });
+
+    const lm = setupCheck("app-1", {
+      session: makeSession({ status: "working", metadata: { agent: "mock-agent" } }),
+      metaOverrides: { agent: "mock-agent" },
+    });
+
+    await lm.check("app-1");
+    expect(lm.getStates().get("app-1")).toBe("idle");
+    expect(mockSessionManager.send).toHaveBeenCalledWith("app-1", "Open the PR now.");
   });
 
   it("does not trigger reaction when auto=false", async () => {
