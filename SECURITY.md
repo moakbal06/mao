@@ -81,7 +81,7 @@ Store all secrets in environment variables:
 
 ```bash
 # .env.local (ignored by git)
-LINEAR_API_KEY=lin_api_example_key
+LINEAR_API_KEY=lin_api_example_key_key
 GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
 ```
