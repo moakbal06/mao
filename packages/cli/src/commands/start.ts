@@ -746,7 +746,25 @@ async function autoCreateConfig(workingDir: string): Promise<OrchestratorConfig>
 
   // Build config with smart defaults
   const projectId = env.isGitRepo ? basename(workingDir) : "my-project";
-  const repo = env.ownerRepo || "owner/repo";
+  let repo = env.ownerRepo || "owner/repo";
+  if (IS_TTY && env.isGitRepo && !env.ownerRepo) {
+    while (true) {
+      const input = await promptText(
+        "Git remote not detected. Enter repo (owner/repo) or URL:",
+        "owner/repo",
+      );
+      if (!input) break;
+      if (isRepoUrl(input)) {
+        repo = parseRepoUrl(input).ownerRepo;
+        break;
+      }
+      if (input.includes("/")) {
+        repo = input.trim();
+        break;
+      }
+      console.log(chalk.yellow("  ⚠ Please enter a repo like owner/repo or a git URL."));
+    }
+  }
   const path = env.isGitRepo ? workingDir : `~/${projectId}`;
   const defaultBranch = env.defaultBranch || "main";
 
