@@ -51,7 +51,6 @@ import {
 import { cleanNextCache } from "../lib/dashboard-rebuild.js";
 import { preflight } from "../lib/preflight.js";
 import { register, unregister, isAlreadyRunning, getRunning, waitForExit } from "../lib/running-state.js";
-import { isHumanCaller } from "../lib/caller-context.js";
 import { detectEnvironment } from "../lib/detect-env.js";
 import { detectAgentRuntime, detectAvailableAgents, type DetectedAgent } from "../lib/detect-agent.js";
 import { detectDefaultBranch } from "../lib/git-utils.js";
@@ -78,7 +77,7 @@ function isSourceCheckout(webDir: string): boolean {
 }
 
 async function ensureLocalWorkspaceReady(webDir: string): Promise<void> {
-  if (!isHumanCaller() || !IS_TTY) return;
+  if (!IS_TTY) return;
   if (!isSourceCheckout(webDir)) return;
 
   const repoRoot = resolve(webDir, "..", "..");
@@ -155,7 +154,7 @@ async function resolveProject(
   }
 
   // No match — prompt if interactive, otherwise error
-  if (isHumanCaller()) {
+  if (IS_TTY) {
     const projectId = await promptSelect(
       `Choose project to ${action}:`,
       projectIds.map((id) => ({
@@ -205,7 +204,7 @@ interface InstallAttempt {
 }
 
 function canPromptForInstall(): boolean {
-  return isHumanCaller() && IS_TTY;
+  return IS_TTY;
 }
 
 function genericInstallHints(command: string): string[] {
@@ -286,7 +285,7 @@ async function ensureJiraConfig(
   projectId: string,
   project: ProjectConfig,
 ): Promise<{ config: OrchestratorConfig; project: ProjectConfig }> {
-  if (!isHumanCaller() || !IS_TTY) return { config, project };
+  if (!IS_TTY) return { config, project };
 
   const tracker = project.tracker as Record<string, unknown> | undefined;
   const trackerPlugin = (tracker?.plugin as string | undefined) || "";
@@ -335,7 +334,7 @@ async function ensureRequiredEnv(
   config: OrchestratorConfig,
   project: ProjectConfig,
 ): Promise<void> {
-  if (!isHumanCaller() || !IS_TTY) return;
+  if (!IS_TTY) return;
 
   const required: Array<{ key: string; label: string }> = [];
   const agentName = getProjectAgentName(config, project);
@@ -1455,7 +1454,7 @@ export function registerStart(program: Command): void {
                 existingConfigPath = undefined;
               }
 
-              if (!env.isGitRepo && isHumanCaller() && IS_TTY) {
+              if (!env.isGitRepo && IS_TTY) {
                 if (existingConfigPath) {
                   const choice = await promptSelect(
                     "This directory isn't a git repo. What do you want to do?",
@@ -1495,7 +1494,7 @@ export function registerStart(program: Command): void {
             } catch (err) {
               if (err instanceof ConfigNotFoundError) {
                 const env = await detectEnvironment(cwd());
-                if (!env.isGitRepo && isHumanCaller() && IS_TTY) {
+                if (!env.isGitRepo && IS_TTY) {
                   const shouldClone = await promptConfirm(
                     "This directory isn't a git repo. Clone a repo here?",
                     true,
@@ -1536,7 +1535,7 @@ export function registerStart(program: Command): void {
           // ── Already-running detection (Step 9) ──
           const running = await isAlreadyRunning();
           if (running) {
-            if (isHumanCaller()) {
+            if (IS_TTY) {
               console.log(chalk.cyan(`\nℹ AO is already running.`));
               console.log(`  Dashboard: ${chalk.cyan(`http://localhost:${running.port}`)}`);
               console.log(`  PID: ${running.pid} | Up since: ${running.startedAt}`);
@@ -1628,7 +1627,7 @@ export function registerStart(program: Command): void {
           }
 
           // ── Tracker + credential setup (interactive, when needed) ──
-          if (isHumanCaller() && IS_TTY) {
+          if (IS_TTY) {
             const jiraSetup = await ensureJiraConfig(config, projectId, project);
             config = jiraSetup.config;
             project = jiraSetup.project;
