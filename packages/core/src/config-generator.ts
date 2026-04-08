@@ -50,7 +50,7 @@ export function parseRepoUrl(url: string): ParsedRepoUrl {
   // SSH format: git@host:owner/repo.git
   const sshMatch = url.match(/^git@([^:]+):([^/]+)\/([^/]+?)(?:\.git)?$/);
   if (sshMatch) {
-    const host = sshMatch[1];
+    const host = sshMatch[1].replace(/\.+$/, "");
     const owner = sshMatch[2];
     const repo = sshMatch[3];
     return {
@@ -65,7 +65,7 @@ export function parseRepoUrl(url: string): ParsedRepoUrl {
   // HTTPS format: https://host/owner/repo[.git]
   const httpsMatch = url.match(/^https?:\/\/([^/]+)\/([^/]+)\/([^/]+?)(?:\.git)?\/?$/);
   if (httpsMatch) {
-    const host = httpsMatch[1];
+    const host = httpsMatch[1].replace(/\.+$/, "");
     const owner = httpsMatch[2];
     const repo = httpsMatch[3];
     return {

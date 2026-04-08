@@ -69,6 +69,12 @@ describe("parseRepoUrl", () => {
     expect(result.ownerRepo).toBe("owner/repo");
   });
 
+  it("normalizes host with trailing dot", () => {
+    const result = parseRepoUrl("https://github.com./owner/repo.git");
+    expect(result.host).toBe("github.com");
+    expect(result.cloneUrl).toBe("https://github.com/owner/repo.git");
+  });
+
   it("parses SSH URL", () => {
     const result = parseRepoUrl("git@github.com:ComposioHQ/DevOS.git");
     expect(result).toEqual({

@@ -59,6 +59,16 @@ async function getCurrentBranch(repoPath: string): Promise<string | null> {
   }
 }
 
+async function ensureRepoHasCommits(repoPath: string): Promise<void> {
+  try {
+    await git(repoPath, "rev-parse", "--verify", "HEAD");
+  } catch {
+    throw new Error(
+      "Repository has no commits yet. Create an initial commit on the default branch and push it before starting the orchestrator.",
+    );
+  }
+}
+
 async function resolveBaseRef(
   repoPath: string,
   defaultBranch: string,
@@ -288,6 +298,7 @@ export function create(config?: Record<string, unknown>): Workspace {
 
       const repoPath = expandPath(cfg.project.path);
       await ensureRepoAvailable(repoPath, cfg.project);
+      await ensureRepoHasCommits(repoPath);
       const projectWorktreeDir = join(worktreeBaseDir, cfg.projectId);
       const worktreePath = join(projectWorktreeDir, cfg.sessionId);
 
@@ -442,6 +453,7 @@ export function create(config?: Record<string, unknown>): Workspace {
     async restore(cfg: WorkspaceCreateConfig, workspacePath: string): Promise<WorkspaceInfo> {
       const repoPath = expandPath(cfg.project.path);
       await ensureRepoAvailable(repoPath, cfg.project);
+      await ensureRepoHasCommits(repoPath);
 
       // Prune stale worktree entries
       try {

@@ -318,6 +318,26 @@ async function ensureJiraConfig(
     }
   }
 
+  if (rawTracker.plugin === "jira" && !rawTracker.readyLabel) {
+    const labelInput = await promptText(
+      "Default Jira label to auto-claim (enter for ready-for-ai):",
+      "ready-for-ai",
+    );
+    const label = labelInput || "ready-for-ai";
+    rawTracker.readyLabel = label.trim();
+    shouldWrite = true;
+  }
+
+  if (rawTracker.plugin === "jira" && !rawTracker.assignee) {
+    const assigneeInput = await promptText(
+      "Default Jira assignee filter (enter for currentUser()):",
+      "currentUser()",
+    );
+    const assignee = assigneeInput || "currentUser()";
+    rawTracker.assignee = assignee.trim();
+    shouldWrite = true;
+  }
+
   if (shouldWrite) {
     rawProject.tracker = rawTracker;
     rawConfig.projects[projectId] = rawProject;
