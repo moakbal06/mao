@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
-import type { OrchestratorEvent, NotifyAction } from "@composio/ao-core";
+import type { OrchestratorEvent, NotifyAction } from "@moakbal/mao-core";
 
 // Mock node:child_process
 vi.mock("node:child_process", () => ({

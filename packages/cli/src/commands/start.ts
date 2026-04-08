@@ -34,7 +34,7 @@ import {
   type OrchestratorConfig,
   type ProjectConfig,
   type ParsedRepoUrl,
-} from "@composio/ao-core";
+} from "@moakbal/mao-core";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { exec, execSilent, git } from "../lib/shell.js";
 import { getSessionManager } from "../lib/create-session-manager.js";
@@ -55,7 +55,7 @@ import { isHumanCaller } from "../lib/caller-context.js";
 import { detectEnvironment } from "../lib/detect-env.js";
 import { detectAgentRuntime, detectAvailableAgents, type DetectedAgent } from "../lib/detect-agent.js";
 import { detectDefaultBranch } from "../lib/git-utils.js";
-import { promptConfirm, promptSelect } from "../lib/prompts.js";
+import { promptConfirm, promptSelect, promptText } from "../lib/prompts.js";
 import {
   detectProjectType,
   generateRulesFromTemplates,
@@ -185,6 +185,152 @@ function genericInstallHints(command: string): string[] {
       ];
     default:
       return [];
+  }
+}
+
+async function promptRepoUrl(): Promise<string> {
+  while (true) {
+    const input = await promptText(
+      "Paste repository URL (https://github.com/org/repo or git@github.com:org/repo.git):",
+      "https://github.com/org/repo",
+    );
+    if (!input) continue;
+    if (isRepoUrl(input)) return input;
+    console.log(chalk.yellow("  ⚠ That doesn't look like a valid repo URL. Try again."));
+  }
+}
+
+function getProjectAgentName(config: OrchestratorConfig, project: ProjectConfig): string {
+  const workerAgent =
+    (project.worker && typeof project.worker === "object"
+      ? (project.worker as Record<string, unknown>)["agent"]
+      : undefined) as string | undefined;
+  const projectAgent =
+    (project.agent && typeof project.agent === "object"
+      ? (project.agent as Record<string, unknown>)["agent"]
+      : undefined) as string | undefined;
+  return workerAgent || projectAgent || config.defaults?.agent || "claude-code";
+}
+
+function parseEnvKeys(content: string): Set<string> {
+  const keys = new Set<string>();
+  const lines = content.split(/\r?\n/);
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line || line.startsWith("#")) continue;
+    const normalized = line.startsWith("export ") ? line.slice(7).trim() : line;
+    const idx = normalized.indexOf("=");
+    if (idx === -1) continue;
+    const key = normalized.slice(0, idx).trim();
+    if (key) keys.add(key);
+  }
+  return keys;
+}
+
+function appendMissingEnvVars(envPath: string, entries: Array<{ key: string; value: string }>): void {
+  const existing = existsSync(envPath) ? parseEnvKeys(readFileSync(envPath, "utf-8")) : new Set();
+  const lines: string[] = [];
+  for (const entry of entries) {
+    if (!entry.value) continue;
+    if (existing.has(entry.key)) continue;
+    lines.push(`${entry.key}=${entry.value}`);
+  }
+  if (lines.length === 0) return;
+
+  const prefix = existsSync(envPath) && readFileSync(envPath, "utf-8").trim().length > 0 ? "\n" : "";
+  writeFileSync(envPath, `${prefix}${lines.join("\n")}\n`, { flag: "a" });
+}
+
+async function ensureJiraConfig(
+  config: OrchestratorConfig,
+  projectId: string,
+  project: ProjectConfig,
+): Promise<{ config: OrchestratorConfig; project: ProjectConfig }> {
+  if (!isHumanCaller() || !IS_TTY) return { config, project };
+
+  const tracker = project.tracker as Record<string, unknown> | undefined;
+  const trackerPlugin = (tracker?.plugin as string | undefined) || "";
+
+  let shouldWrite = false;
+  const rawYaml = readFileSync(config.configPath, "utf-8");
+  const rawConfig = yamlParse(rawYaml);
+  const rawProject = rawConfig.projects[projectId] ?? {};
+  const rawTracker = (rawProject.tracker ?? {}) as Record<string, unknown>;
+
+  if (!rawTracker.plugin) {
+    rawTracker.plugin = "jira";
+    shouldWrite = true;
+  } else if (rawTracker.plugin !== "jira") {
+    const switchToJira = await promptConfirm(
+      `Tracker is "${rawTracker.plugin}". Use Jira instead?`,
+      true,
+    );
+    if (switchToJira) {
+      rawTracker.plugin = "jira";
+      shouldWrite = true;
+    }
+  }
+
+  if (rawTracker.plugin === "jira" && !rawTracker.projectKey) {
+    const key = await promptText("Jira project key (e.g. PROJ):");
+    if (key) {
+      rawTracker.projectKey = key.trim().toUpperCase();
+      shouldWrite = true;
+    }
+  }
+
+  if (shouldWrite) {
+    rawProject.tracker = rawTracker;
+    rawConfig.projects[projectId] = rawProject;
+    writeFileSync(config.configPath, yamlStringify(rawConfig, { indent: 2 }));
+    console.log(chalk.dim(`  ✓ Saved tracker settings to ${config.configPath}`));
+    config = loadConfig(config.configPath);
+    project = config.projects[projectId];
+  }
+
+  return { config, project };
+}
+
+async function ensureRequiredEnv(
+  config: OrchestratorConfig,
+  project: ProjectConfig,
+): Promise<void> {
+  if (!isHumanCaller() || !IS_TTY) return;
+
+  const required: Array<{ key: string; label: string }> = [];
+  const agentName = getProjectAgentName(config, project);
+  if (agentName === "claude-code") {
+    required.push({ key: "ANTHROPIC_API_KEY", label: "Anthropic API key" });
+  } else if (agentName === "codex") {
+    required.push({ key: "OPENAI_API_KEY", label: "OpenAI API key" });
+  }
+
+  const tracker = project.tracker as Record<string, unknown> | undefined;
+  const trackerPlugin = (tracker?.plugin as string | undefined) || "";
+  if (trackerPlugin === "jira") {
+    required.push({ key: "JIRA_BASE_URL", label: "Jira base URL (https://your-domain.atlassian.net)" });
+    required.push({ key: "JIRA_EMAIL", label: "Jira email" });
+    required.push({ key: "JIRA_API_TOKEN", label: "Jira API token" });
+  }
+
+  const missing = required.filter((r) => !process.env[r.key] || process.env[r.key]!.length === 0);
+  if (missing.length === 0) return;
+
+  console.log(chalk.dim("\nMissing required credentials. Let's set them now."));
+
+  const updates: Array<{ key: string; value: string }> = [];
+  for (const item of missing) {
+    const value = await promptText(`${item.label}:`);
+    if (value) {
+      process.env[item.key] = value;
+      updates.push({ key: item.key, value });
+    }
+  }
+
+  if (updates.length > 0) {
+    const envPath = resolve(project.path.replace(/^~/, process.env["HOME"] || ""), ".env");
+    appendMissingEnvVars(envPath, updates);
+    console.log(chalk.dim(`  ✓ Saved credentials to ${envPath}`));
   }
 }
 
@@ -1171,6 +1317,7 @@ export function registerStart(program: Command): void {
     .description(
       "Start orchestrator agent and dashboard (auto-creates config on first run, adds projects by path/URL)",
     )
+    .option("-u, --url <repo>", "Clone repo URL into the current directory and start")
     .option("--no-dashboard", "Skip starting the dashboard server")
     .option("--no-orchestrator", "Skip starting the orchestrator agent")
     .option("--rebuild", "Clean and rebuild dashboard before starting")
@@ -1179,6 +1326,7 @@ export function registerStart(program: Command): void {
       async (
         projectArg?: string,
         opts?: {
+          url?: string;
           dashboard?: boolean;
           orchestrator?: boolean;
           rebuild?: boolean;
@@ -1186,16 +1334,29 @@ export function registerStart(program: Command): void {
         },
       ) => {
         try {
-          let config: OrchestratorConfig;
-          let projectId: string;
-          let project: ProjectConfig;
+          let config: OrchestratorConfig | null = null;
+          let projectId: string | null = null;
+          let project: ProjectConfig | null = null;
+          let projectResolved = false;
 
-          if (projectArg && isRepoUrl(projectArg)) {
+          const urlArg = opts?.url?.trim();
+
+          if (urlArg) {
+            if (!isRepoUrl(urlArg)) {
+              throw new Error(`Invalid repo URL: "${urlArg}"`);
+            }
+            console.log(chalk.bold.cyan("\n  Agent Orchestrator — Quick Start\n"));
+            const result = await handleUrlStart(urlArg);
+            config = result.config;
+            ({ projectId, project } = await resolveProjectByRepo(config, result.parsed));
+            projectResolved = true;
+          } else if (projectArg && isRepoUrl(projectArg)) {
             // ── URL argument: clone + auto-config + start ──
             console.log(chalk.bold.cyan("\n  Agent Orchestrator — Quick Start\n"));
             const result = await handleUrlStart(projectArg);
             config = result.config;
             ({ projectId, project } = await resolveProjectByRepo(config, result.parsed));
+            projectResolved = true;
           } else if (projectArg && isLocalPath(projectArg)) {
             // ── Path argument: add project if new, then start ──
             const resolvedPath = resolve(projectArg.replace(/^~/, process.env["HOME"] || ""));
@@ -1240,21 +1401,95 @@ export function registerStart(program: Command): void {
                 project = config.projects[projectId];
               }
             }
+            projectResolved = true;
           } else {
             // ── No arg or project ID: load config or auto-create ──
             let loadedConfig: OrchestratorConfig | null = null;
             try {
-              loadedConfig = loadConfig();
+              const env = await detectEnvironment(cwd());
+              let existingConfigPath: string | undefined;
+              try {
+                existingConfigPath = findConfigFile() ?? undefined;
+              } catch {
+                existingConfigPath = undefined;
+              }
+
+              if (!env.isGitRepo && isHumanCaller() && IS_TTY) {
+                if (existingConfigPath) {
+                  const choice = await promptSelect(
+                    "This directory isn't a git repo. What do you want to do?",
+                    [
+                      { value: "clone", label: "Clone a repo here", hint: "Provide a URL" },
+                      { value: "use", label: "Use existing config", hint: existingConfigPath },
+                    ],
+                    "clone",
+                  );
+                  if (choice === "clone") {
+                    const repoUrl = await promptRepoUrl();
+                    const result = await handleUrlStart(repoUrl);
+                    config = result.config;
+                    ({ projectId, project } = await resolveProjectByRepo(config, result.parsed));
+                    projectResolved = true;
+                  } else {
+                    loadedConfig = loadConfig(existingConfigPath);
+                  }
+                } else {
+                  const shouldClone = await promptConfirm(
+                    "This directory isn't a git repo. Clone a repo here?",
+                    true,
+                  );
+                  if (shouldClone) {
+                    const repoUrl = await promptRepoUrl();
+                    const result = await handleUrlStart(repoUrl);
+                    config = result.config;
+                    ({ projectId, project } = await resolveProjectByRepo(config, result.parsed));
+                    projectResolved = true;
+                  } else {
+                    loadedConfig = await autoCreateConfig(cwd());
+                  }
+                }
+              } else {
+                loadedConfig = loadConfig();
+              }
             } catch (err) {
               if (err instanceof ConfigNotFoundError) {
-                // First run — auto-create config
-                loadedConfig = await autoCreateConfig(cwd());
+                const env = await detectEnvironment(cwd());
+                if (!env.isGitRepo && isHumanCaller() && IS_TTY) {
+                  const shouldClone = await promptConfirm(
+                    "This directory isn't a git repo. Clone a repo here?",
+                    true,
+                  );
+                  if (shouldClone) {
+                    const repoUrl = await promptRepoUrl();
+                    const result = await handleUrlStart(repoUrl);
+                    config = result.config;
+                    ({ projectId, project } = await resolveProjectByRepo(config, result.parsed));
+                    projectResolved = true;
+                  } else {
+                    loadedConfig = await autoCreateConfig(cwd());
+                  }
+                } else {
+                  // First run — auto-create config
+                  loadedConfig = await autoCreateConfig(cwd());
+                }
               } else {
                 throw err;
               }
             }
-            config = loadedConfig;
+            if (!projectResolved) {
+              config = loadedConfig;
+            }
+          }
+
+          if (!projectResolved) {
+            if (!config) {
+              throw new Error("Failed to load configuration.");
+            }
             ({ projectId, project } = await resolveProject(config, projectArg));
+          }
+
+          if (!config || !projectId || !project) {
+            throw new Error("Failed to resolve project configuration.");
           }
 
           // ── Already-running detection (Step 9) ──
@@ -1349,6 +1584,14 @@ export function registerStart(program: Command): void {
             
             config = loadConfig(config.configPath);
             project = config.projects[projectId];
+          }
+
+          // ── Tracker + credential setup (interactive, when needed) ──
+          if (isHumanCaller() && IS_TTY) {
+            const jiraSetup = await ensureJiraConfig(config, projectId, project);
+            config = jiraSetup.config;
+            project = jiraSetup.project;
+            await ensureRequiredEnv(config, project);
           }
 
           const actualPort = await runStartup(config, projectId, project, opts);

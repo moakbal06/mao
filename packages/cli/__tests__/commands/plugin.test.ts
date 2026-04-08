@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
 import { parse as parseYaml } from "yaml";
-import type { PluginManifest, PluginModule } from "@composio/ao-core";
+import type { PluginManifest, PluginModule } from "@moakbal/mao-core";
 
 const {
   mockFindConfigFile,
@@ -24,7 +24,7 @@ const {
   mockUninstallPackageFromStore: vi.fn(),
 }));
 
-vi.mock("@composio/ao-core", async (importOriginal) => {
+vi.mock("@moakbal/mao-core", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -48,8 +48,8 @@ vi.mock("../../src/commands/setup.js", () => ({
 
 import { registerPlugin } from "../../src/commands/plugin.js";
 
-const OPENCLAW_PACKAGE = "@composio/ao-plugin-notifier-openclaw";
-const GOOSE_PACKAGE = "@example/ao-plugin-agent-goose";
+const OPENCLAW_PACKAGE = "@moakbal/mao-plugin-notifier-openclaw";
+const GOOSE_PACKAGE = "@example/mao-plugin-agent-goose";
 
 function makePlugin(slot: PluginManifest["slot"], name: string): PluginModule {
   return {
@@ -156,7 +156,7 @@ describe("plugin command", () => {
       json: async () => [
         {
           id: "tracker-jira",
-          package: "@example/ao-plugin-tracker-jira",
+          package: "@example/mao-plugin-tracker-jira",
           slot: "tracker",
           description: "Tracker plugin: Jira issues",
           source: "registry",
@@ -206,7 +206,7 @@ describe("plugin command", () => {
       "--author",
       "Alice",
       "--package-name",
-      "@alice/ao-plugin-notifier-acme-alerts",
+      "@alice/mao-plugin-notifier-acme-alerts",
       "--non-interactive",
     ]);
 
@@ -219,9 +219,9 @@ describe("plugin command", () => {
       author?: string;
       dependencies?: Record<string, string>;
     };
-    expect(packageJson.name).toBe("@alice/ao-plugin-notifier-acme-alerts");
+    expect(packageJson.name).toBe("@alice/mao-plugin-notifier-acme-alerts");
     expect(packageJson.author).toBe("Alice");
-    expect(packageJson.dependencies?.["@composio/ao-core"]).toBe("^0.2.0");
+    expect(packageJson.dependencies?.["@moakbal/mao-core"]).toBe("^0.2.0");
 
     const entrypoint = readFileSync(join(targetDir, "src", "index.ts"), "utf-8");
     expect(entrypoint).toContain('slot: "notifier" as const');

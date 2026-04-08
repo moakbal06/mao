@@ -1084,6 +1084,7 @@ export interface DefaultPlugins {
   runtime: string;
   agent: string;
   workspace: string;
+  tracker?: string;
   notifiers: string[];
   orchestrator?: {
     agent?: string;

@@ -5,7 +5,7 @@ import type {
   NotifyAction,
   NotifyContext,
   EventPriority,
-} from "@composio/ao-core";
+} from "@moakbal/mao-core";
 
 export const manifest = {
   name: "composio",

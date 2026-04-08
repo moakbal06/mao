@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { loadConfig } from "@composio/ao-core";
+import { loadConfig } from "@moakbal/mao-core";
 
 export interface ProjectInfo {
   id: string;

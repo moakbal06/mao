@@ -7,7 +7,7 @@ import {
   type NotifyContext,
   type EventPriority,
   CI_STATUS,
-} from "@composio/ao-core";
+} from "@moakbal/mao-core";
 
 export const manifest = {
   name: "slack",

@@ -5,8 +5,8 @@
  * Everything else runs for real: config parsing, Block Kit construction, channel routing.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { NotifyAction, EventPriority } from "@composio/ao-core";
-import slackPlugin from "@composio/ao-plugin-notifier-slack";
+import type { NotifyAction, EventPriority } from "@moakbal/mao-core";
+import slackPlugin from "@moakbal/mao-plugin-notifier-slack";
 import { makeEvent } from "./helpers/event-factory.js";
 
 function mockFetchOk() {

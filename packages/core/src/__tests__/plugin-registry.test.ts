@@ -152,9 +152,9 @@ describe("loadBuiltins", () => {
     const fakeOpenCode = makePlugin("agent", "opencode");
 
     await registry.loadBuiltins(undefined, async (pkg: string) => {
-      if (pkg === "@composio/ao-plugin-agent-claude-code") return fakeClaudeCode;
-      if (pkg === "@composio/ao-plugin-agent-codex") return fakeCodex;
-      if (pkg === "@composio/ao-plugin-agent-opencode") return fakeOpenCode;
+      if (pkg === "@moakbal/mao-plugin-agent-claude-code") return fakeClaudeCode;
+      if (pkg === "@moakbal/mao-plugin-agent-codex") return fakeCodex;
+      if (pkg === "@moakbal/mao-plugin-agent-opencode") return fakeOpenCode;
       throw new Error(`Not found: ${pkg}`);
     });
 
@@ -175,8 +175,8 @@ describe("loadBuiltins", () => {
     const fakeScm = makePlugin("scm", "gitlab");
 
     await registry.loadBuiltins(undefined, async (pkg: string) => {
-      if (pkg === "@composio/ao-plugin-tracker-gitlab") return fakeTracker;
-      if (pkg === "@composio/ao-plugin-scm-gitlab") return fakeScm;
+      if (pkg === "@moakbal/mao-plugin-tracker-gitlab") return fakeTracker;
+      if (pkg === "@moakbal/mao-plugin-scm-gitlab") return fakeScm;
       throw new Error(`Not found: ${pkg}`);
     });
 
@@ -203,7 +203,7 @@ describe("loadBuiltins", () => {
     });
 
     await registry.loadBuiltins(config, async (pkg: string) => {
-      if (pkg === "@composio/ao-plugin-notifier-webhook") return fakeWebhookNotifier;
+      if (pkg === "@moakbal/mao-plugin-notifier-webhook") return fakeWebhookNotifier;
       throw new Error(`Not found: ${pkg}`);
     });
 
@@ -228,7 +228,7 @@ describe("loadBuiltins", () => {
     });
 
     await registry.loadBuiltins(config, async (pkg: string) => {
-      if (pkg === "@composio/ao-plugin-notifier-webhook") return fakeWebhookNotifier;
+      if (pkg === "@moakbal/mao-plugin-notifier-webhook") return fakeWebhookNotifier;
       throw new Error(`Not found: ${pkg}`);
     });
 
@@ -252,7 +252,7 @@ describe("loadBuiltins", () => {
     });
 
     await registry.loadBuiltins(cfg, async (pkg: string) => {
-      if (pkg === "@composio/ao-plugin-notifier-openclaw") return fakeOpenClaw;
+      if (pkg === "@moakbal/mao-plugin-notifier-openclaw") return fakeOpenClaw;
       throw new Error(`Not found: ${pkg}`);
     });
 
@@ -271,7 +271,7 @@ describe("loadBuiltins", () => {
         mywebhook: {
           plugin: "webhook",
           // package field is allowed for resolution but should be stripped:
-          package: "@composio/ao-plugin-notifier-webhook",
+          package: "@moakbal/mao-plugin-notifier-webhook",
           // These are plugin-specific fields that should be passed through:
           url: "https://webhook.example.com/notify",
           retries: 3,
@@ -280,7 +280,7 @@ describe("loadBuiltins", () => {
     });
 
     await registry.loadBuiltins(cfg, async (pkg: string) => {
-      if (pkg === "@composio/ao-plugin-notifier-webhook") return fakeWebhook;
+      if (pkg === "@moakbal/mao-plugin-notifier-webhook") return fakeWebhook;
       throw new Error(`Not found: ${pkg}`);
     });
 
@@ -308,7 +308,7 @@ describe("loadBuiltins", () => {
     const stderrSpy = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
 
     await registry.loadBuiltins(cfg, async (pkg: string) => {
-      if (pkg === "@composio/ao-plugin-notifier-webhook") return fakeWebhook;
+      if (pkg === "@moakbal/mao-plugin-notifier-webhook") return fakeWebhook;
       return null;
     });
 
@@ -334,8 +334,8 @@ describe("loadBuiltins", () => {
     });
 
     await registry.loadBuiltins(cfg, async (pkg: string) => {
-      if (pkg === "@composio/ao-plugin-notifier-openclaw") return fakeOpenClaw;
-      if (pkg === "@composio/ao-plugin-notifier-webhook") return fakeWebhook;
+      if (pkg === "@moakbal/mao-plugin-notifier-openclaw") return fakeOpenClaw;
+      if (pkg === "@moakbal/mao-plugin-notifier-webhook") return fakeWebhook;
       throw new Error(`Not found: ${pkg}`);
     });
 
@@ -353,7 +353,7 @@ describe("loadBuiltins", () => {
     const fakeImportFn = async (pkg: string): Promise<unknown> => {
       importedPackages.push(pkg);
       // Return a valid plugin module for runtime-tmux
-      if (pkg === "@composio/ao-plugin-runtime-tmux") {
+      if (pkg === "@moakbal/mao-plugin-runtime-tmux") {
         return {
           manifest: { name: "tmux", slot: "runtime", description: "test", version: "0.0.0" },
           create: () => ({ name: "tmux" }),
@@ -367,7 +367,7 @@ describe("loadBuiltins", () => {
 
     // importFn should have been called for all builtin plugins
     expect(importedPackages.length).toBeGreaterThan(0);
-    expect(importedPackages).toContain("@composio/ao-plugin-runtime-tmux");
+    expect(importedPackages).toContain("@moakbal/mao-plugin-runtime-tmux");
 
     // The tmux plugin should be registered
     const tmux = registry.get("runtime", "tmux");
@@ -424,7 +424,7 @@ describe("loadFromConfig", () => {
 
     // Should have attempted to import builtin plugins via the provided importFn
     expect(importedPackages.length).toBeGreaterThan(0);
-    expect(importedPackages).toContain("@composio/ao-plugin-runtime-tmux");
+    expect(importedPackages).toContain("@moakbal/mao-plugin-runtime-tmux");
   });
 
   it("loads external package plugins from config.plugins", async () => {
@@ -436,13 +436,13 @@ describe("loadFromConfig", () => {
         {
           name: "goose",
           source: "npm",
-          package: "@example/ao-plugin-agent-goose",
+          package: "@example/mao-plugin-agent-goose",
         },
       ],
     });
 
     await registry.loadFromConfig(config, async (specifier: string) => {
-      if (specifier === "@example/ao-plugin-agent-goose") {
+      if (specifier === "@example/mao-plugin-agent-goose") {
         return { default: agentPlugin };
       }
       throw new Error(`Not found: ${specifier}`);
@@ -497,7 +497,7 @@ describe("loadFromConfig", () => {
         {
           name: "goose",
           source: "npm",
-          package: "@example/ao-plugin-agent-goose",
+          package: "@example/mao-plugin-agent-goose",
           enabled: false,
         },
       ],
@@ -508,7 +508,7 @@ describe("loadFromConfig", () => {
 
     await registry.loadFromConfig(config, importFn);
 
-    expect(importFn).not.toHaveBeenCalledWith("@example/ao-plugin-agent-goose");
+    expect(importFn).not.toHaveBeenCalledWith("@example/mao-plugin-agent-goose");
     expect(registry.get("agent", "goose")).toBeNull();
   });
 });
@@ -527,7 +527,7 @@ describe("External plugin manifest validation", () => {
     const config = makeOrchestratorConfig({
       configPath: "/test/config.yaml",
       plugins: [
-        { name: "jira", source: "npm", package: "@acme/ao-plugin-tracker-jira", enabled: true },
+        { name: "jira", source: "npm", package: "@acme/mao-plugin-tracker-jira", enabled: true },
       ],
       projects: {
         proj1: {
@@ -536,7 +536,7 @@ describe("External plugin manifest validation", () => {
           name: "proj1",
           defaultBranch: "main",
           sessionPrefix: "test",
-          tracker: { plugin: "jira", package: "@acme/ao-plugin-tracker-jira" },
+          tracker: { plugin: "jira", package: "@acme/mao-plugin-tracker-jira" },
         },
       },
       _externalPluginEntries: [
@@ -544,7 +544,7 @@ describe("External plugin manifest validation", () => {
           source: "projects.proj1.tracker",
           location: { kind: "project", projectId: "proj1", configType: "tracker" },
           slot: "tracker",
-          package: "@acme/ao-plugin-tracker-jira",
+          package: "@acme/mao-plugin-tracker-jira",
           expectedPluginName: "jira",
         },
       ],
@@ -568,7 +568,7 @@ describe("External plugin manifest validation", () => {
     const config = makeOrchestratorConfig({
       configPath: "/test/config.yaml",
       plugins: [
-        { name: "jira", source: "npm", package: "@acme/ao-plugin-tracker-jira", enabled: true },
+        { name: "jira", source: "npm", package: "@acme/mao-plugin-tracker-jira", enabled: true },
       ],
       projects: {
         proj1: {
@@ -577,7 +577,7 @@ describe("External plugin manifest validation", () => {
           name: "proj1",
           defaultBranch: "main",
           sessionPrefix: "test",
-          tracker: { plugin: "jira", package: "@acme/ao-plugin-tracker-jira" },
+          tracker: { plugin: "jira", package: "@acme/mao-plugin-tracker-jira" },
         },
       },
       _externalPluginEntries: [
@@ -585,7 +585,7 @@ describe("External plugin manifest validation", () => {
           source: "projects.proj1.tracker",
           location: { kind: "project", projectId: "proj1", configType: "tracker" },
           slot: "tracker",
-          package: "@acme/ao-plugin-tracker-jira",
+          package: "@acme/mao-plugin-tracker-jira",
           expectedPluginName: "jira",
         },
       ],
@@ -618,7 +618,7 @@ describe("External plugin manifest validation", () => {
     const config = makeOrchestratorConfig({
       configPath: "/test/config.yaml",
       plugins: [
-        { name: "jira", source: "npm", package: "@acme/ao-plugin-tracker-jira", enabled: true },
+        { name: "jira", source: "npm", package: "@acme/mao-plugin-tracker-jira", enabled: true },
       ],
       projects: {
         proj1: {
@@ -628,7 +628,7 @@ describe("External plugin manifest validation", () => {
           defaultBranch: "main",
           sessionPrefix: "test",
           // Plugin field will be updated with manifest.name
-          tracker: { plugin: "jira", package: "@acme/ao-plugin-tracker-jira" },
+          tracker: { plugin: "jira", package: "@acme/mao-plugin-tracker-jira" },
         },
       },
       _externalPluginEntries: [
@@ -636,7 +636,7 @@ describe("External plugin manifest validation", () => {
           source: "projects.proj1.tracker",
           location: { kind: "project", projectId: "proj1", configType: "tracker" },
           slot: "tracker",
-          package: "@acme/ao-plugin-tracker-jira",
+          package: "@acme/mao-plugin-tracker-jira",
           // No expectedPluginName - should accept any manifest.name
         },
       ],
@@ -663,7 +663,7 @@ describe("External plugin manifest validation", () => {
     const config = makeOrchestratorConfig({
       configPath: "/test/config.yaml",
       plugins: [
-        { name: "teams", source: "npm", package: "@acme/ao-plugin-notifier-teams", enabled: true },
+        { name: "teams", source: "npm", package: "@acme/mao-plugin-notifier-teams", enabled: true },
       ],
       projects: {
         proj1: {
@@ -675,14 +675,14 @@ describe("External plugin manifest validation", () => {
         },
       },
       notifiers: {
-        myteams: { plugin: "teams", package: "@acme/ao-plugin-notifier-teams" },
+        myteams: { plugin: "teams", package: "@acme/mao-plugin-notifier-teams" },
       },
       _externalPluginEntries: [
         {
           source: "notifiers.myteams",
           location: { kind: "notifier", notifierId: "myteams" },
           slot: "notifier",
-          package: "@acme/ao-plugin-notifier-teams",
+          package: "@acme/mao-plugin-notifier-teams",
           // No expectedPluginName - will accept any manifest.name
         },
       ],
@@ -710,7 +710,7 @@ describe("External plugin manifest validation", () => {
       configPath: "/test/config.yaml",
       plugins: [
         // Temp name is "teams" (from package name), but manifest.name is "ms-teams"
-        { name: "teams", source: "npm", package: "@acme/ao-plugin-notifier-teams", enabled: true },
+        { name: "teams", source: "npm", package: "@acme/mao-plugin-notifier-teams", enabled: true },
       ],
       projects: {
         proj1: {
@@ -724,7 +724,7 @@ describe("External plugin manifest validation", () => {
       notifiers: {
         myteams: {
           plugin: "teams", // Temp name - will be updated to "ms-teams"
-          package: "@acme/ao-plugin-notifier-teams",
+          package: "@acme/mao-plugin-notifier-teams",
           webhookUrl: "https://teams.webhook.url/abc123",
           channel: "#alerts",
         },
@@ -734,7 +734,7 @@ describe("External plugin manifest validation", () => {
           source: "notifiers.myteams",
           location: { kind: "notifier", notifierId: "myteams" },
           slot: "notifier",
-          package: "@acme/ao-plugin-notifier-teams",
+          package: "@acme/mao-plugin-notifier-teams",
           // No expectedPluginName - config.plugin will be updated to manifest.name
         },
       ],
@@ -769,7 +769,7 @@ describe("External plugin manifest validation", () => {
     const config = makeOrchestratorConfig({
       configPath: "/test/config.yaml",
       plugins: [
-        { name: "jira", source: "npm", package: "@acme/ao-plugin-tracker-jira", enabled: true },
+        { name: "jira", source: "npm", package: "@acme/mao-plugin-tracker-jira", enabled: true },
       ],
       projects: {
         proj1: {
@@ -778,7 +778,7 @@ describe("External plugin manifest validation", () => {
           name: "proj1",
           defaultBranch: "main",
           sessionPrefix: "test",
-          tracker: { plugin: "jira", package: "@acme/ao-plugin-tracker-jira" },
+          tracker: { plugin: "jira", package: "@acme/mao-plugin-tracker-jira" },
         },
       },
       _externalPluginEntries: [
@@ -786,7 +786,7 @@ describe("External plugin manifest validation", () => {
           source: "projects.proj1.tracker",
           location: { kind: "project", projectId: "proj1", configType: "tracker" },
           slot: "tracker", // Expected tracker
-          package: "@acme/ao-plugin-tracker-jira",
+          package: "@acme/mao-plugin-tracker-jira",
         },
       ],
     });
@@ -813,7 +813,7 @@ describe("External plugin manifest validation", () => {
     const config = makeOrchestratorConfig({
       configPath: "/test/config.yaml",
       plugins: [
-        { name: "jira", source: "npm", package: "@acme/ao-plugin-tracker-jira", enabled: true },
+        { name: "jira", source: "npm", package: "@acme/mao-plugin-tracker-jira", enabled: true },
       ],
       projects: {
         proj1: {
@@ -822,7 +822,7 @@ describe("External plugin manifest validation", () => {
           name: "proj1",
           defaultBranch: "main",
           sessionPrefix: "test1",
-          tracker: { plugin: "jira", package: "@acme/ao-plugin-tracker-jira" },
+          tracker: { plugin: "jira", package: "@acme/mao-plugin-tracker-jira" },
         },
         proj2: {
           path: "/repos/test2",
@@ -831,7 +831,7 @@ describe("External plugin manifest validation", () => {
           defaultBranch: "main",
           sessionPrefix: "test2",
           // Same external plugin as proj1
-          tracker: { plugin: "jira", package: "@acme/ao-plugin-tracker-jira" },
+          tracker: { plugin: "jira", package: "@acme/mao-plugin-tracker-jira" },
         },
       },
       _externalPluginEntries: [
@@ -839,14 +839,14 @@ describe("External plugin manifest validation", () => {
           source: "projects.proj1.tracker",
           location: { kind: "project", projectId: "proj1", configType: "tracker" },
           slot: "tracker",
-          package: "@acme/ao-plugin-tracker-jira",
+          package: "@acme/mao-plugin-tracker-jira",
           // No expectedPluginName - will accept any manifest.name
         },
         {
           source: "projects.proj2.tracker",
           location: { kind: "project", projectId: "proj2", configType: "tracker" },
           slot: "tracker",
-          package: "@acme/ao-plugin-tracker-jira",
+          package: "@acme/mao-plugin-tracker-jira",
           // No expectedPluginName - will accept any manifest.name
         },
       ],
@@ -874,7 +874,7 @@ describe("External plugin manifest validation", () => {
     const config = makeOrchestratorConfig({
       configPath: "/test/config.yaml",
       plugins: [
-        { name: "jira", source: "npm", package: "@acme/ao-plugin-tracker-jira", enabled: true },
+        { name: "jira", source: "npm", package: "@acme/mao-plugin-tracker-jira", enabled: true },
       ],
       projects: {
         proj1: {
@@ -883,7 +883,7 @@ describe("External plugin manifest validation", () => {
           name: "proj1",
           defaultBranch: "main",
           sessionPrefix: "test1",
-          tracker: { plugin: "jira", package: "@acme/ao-plugin-tracker-jira" },
+          tracker: { plugin: "jira", package: "@acme/mao-plugin-tracker-jira" },
         },
         proj2: {
           path: "/repos/test2",
@@ -892,7 +892,7 @@ describe("External plugin manifest validation", () => {
           defaultBranch: "main",
           sessionPrefix: "test2",
           // Same external plugin but with WRONG explicit plugin name
-          tracker: { plugin: "wrong-name", package: "@acme/ao-plugin-tracker-jira" },
+          tracker: { plugin: "wrong-name", package: "@acme/mao-plugin-tracker-jira" },
         },
       },
       _externalPluginEntries: [
@@ -900,14 +900,14 @@ describe("External plugin manifest validation", () => {
           source: "projects.proj1.tracker",
           location: { kind: "project", projectId: "proj1", configType: "tracker" },
           slot: "tracker",
-          package: "@acme/ao-plugin-tracker-jira",
+          package: "@acme/mao-plugin-tracker-jira",
           // No expectedPluginName - will accept any manifest.name
         },
         {
           source: "projects.proj2.tracker",
           location: { kind: "project", projectId: "proj2", configType: "tracker" },
           slot: "tracker",
-          package: "@acme/ao-plugin-tracker-jira",
+          package: "@acme/mao-plugin-tracker-jira",
           expectedPluginName: "wrong-name", // Mismatches manifest.name "jira-cloud"
         },
       ],

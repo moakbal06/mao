@@ -1,5 +1,5 @@
 /**
- * Web directory locator — finds the @composio/ao-web package.
+ * Web directory locator — finds the @moakbal/mao-web package.
  * Shared utility to avoid duplication between dashboard.ts and start.ts.
  */
 
@@ -177,14 +177,14 @@ export async function buildDashboardEnv(
 }
 
 /**
- * Locate the @composio/ao-web package directory.
+ * Locate the @moakbal/mao-web package directory.
  * Uses createRequire for ESM-compatible require.resolve, with fallback
  * to sibling package paths that work from both src/ and dist/.
  */
 export function findWebDir(): string {
   // Try to resolve from node_modules first (installed as workspace dep)
   try {
-    const pkgJson = require.resolve("@composio/ao-web/package.json");
+    const pkgJson = require.resolve("@moakbal/mao-web/package.json");
     return resolve(pkgJson, "..");
   } catch {
     // Fallback: sibling package in monorepo (works both from src/ and dist/)
@@ -200,8 +200,8 @@ export function findWebDir(): string {
       }
     }
     throw new Error(
-      "Could not find @composio/ao-web package.\n" +
-      "  If installed via npm:    npm install -g @composio/ao\n" +
+      "Could not find @moakbal/mao-web package.\n" +
+      "  If installed via npm:    npm install -g @moakbal/mao\n" +
       "  If cloned from source:   pnpm install && pnpm build",
     );
   }

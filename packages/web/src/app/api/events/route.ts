@@ -6,7 +6,7 @@ import {
   createCorrelationId,
   createProjectObserver,
   type ProjectObserver,
-} from "@composio/ao-core";
+} from "@moakbal/mao-core";
 
 export const dynamic = "force-dynamic";
 

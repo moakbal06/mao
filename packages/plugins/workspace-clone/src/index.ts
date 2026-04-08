@@ -1,7 +1,7 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { existsSync, rmSync, mkdirSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
 import { homedir } from "node:os";
 import type {
   PluginModule,
@@ -9,9 +9,11 @@ import type {
   WorkspaceCreateConfig,
   WorkspaceInfo,
   ProjectConfig,
-} from "@composio/ao-core";
+} from "@moakbal/mao-core";
 
 const execFileAsync = promisify(execFile);
+const GIT_TIMEOUT = 30_000;
+const DEFAULT_BRANCH_FALLBACKS = ["main", "master"];
 
 export const manifest = {
   name: "clone",
@@ -43,6 +45,134 @@ function expandPath(p: string): string {
   return p;
 }
 
+function dedupeBranches(branches: string[]): string[] {
+  const result: string[] = [];
+  const seen = new Set<string>();
+  for (const branch of branches) {
+    const trimmed = branch?.trim();
+    if (!trimmed || seen.has(trimmed)) continue;
+    seen.add(trimmed);
+    result.push(trimmed);
+  }
+  return result;
+}
+
+function normalizeRepoUrl(repo: string): string {
+  const trimmed = repo.trim();
+  const hasScheme = /^[a-z+]+:\/\//i.test(trimmed) || trimmed.startsWith("git@");
+  if (hasScheme) return trimmed;
+  const withGit = trimmed.endsWith(".git") ? trimmed : `${trimmed}.git`;
+  return `https://github.com/${withGit}`;
+}
+
+async function resolveRemoteDefaultBranch(
+  remoteUrl: string,
+  candidates: string[],
+): Promise<string | undefined> {
+  try {
+    const { stdout } = await execFileAsync(
+      "git",
+      ["ls-remote", "--symref", remoteUrl, "HEAD"],
+      { timeout: GIT_TIMEOUT },
+    );
+    const line = stdout
+      .split("\n")
+      .map((l) => l.trim())
+      .find((l) => l.startsWith("ref: "));
+    if (line) {
+      const tokens = line.split(" ").filter(Boolean);
+      const refToken = tokens[1];
+      if (refToken?.startsWith("refs/heads/")) {
+        return refToken.slice("refs/heads/".length);
+      }
+    }
+  } catch {
+    // Fall through
+  }
+
+  for (const candidate of candidates) {
+    try {
+      const { stdout } = await execFileAsync(
+        "git",
+        ["ls-remote", "--heads", remoteUrl, candidate],
+        { timeout: GIT_TIMEOUT },
+      );
+      if (stdout.trim().length > 0) return candidate;
+    } catch {
+      // Ignore and continue
+    }
+  }
+
+  return undefined;
+}
+
+async function ensureRepoAvailable(repoPath: string, project: ProjectConfig): Promise<void> {
+  if (existsSync(repoPath)) return;
+
+  if (!project.repo || typeof project.repo !== "string") {
+    throw new Error(
+      `Project path "${repoPath}" does not exist and no project.repo is configured to clone from`,
+    );
+  }
+
+  const remoteUrl = normalizeRepoUrl(project.repo);
+  const requested = project.defaultBranch || "main";
+  const candidates = dedupeBranches([requested, ...DEFAULT_BRANCH_FALLBACKS]);
+  const remoteDefault = await resolveRemoteDefaultBranch(remoteUrl, candidates);
+  const branchCandidates = dedupeBranches([remoteDefault ?? "", ...candidates]);
+
+  mkdirSync(dirname(repoPath), { recursive: true });
+
+  let lastError: unknown;
+  for (const branch of branchCandidates) {
+    try {
+      await execFileAsync(
+        "git",
+        ["clone", "--branch", branch, remoteUrl, repoPath],
+        { timeout: GIT_TIMEOUT },
+      );
+      return;
+    } catch (err: unknown) {
+      lastError = err;
+      const msg = err instanceof Error ? err.message : String(err);
+      if (
+        msg.includes("Remote branch") ||
+        msg.includes("could not find remote branch") ||
+        msg.includes("not found") && msg.includes("branch")
+      ) {
+        if (existsSync(repoPath)) {
+          rmSync(repoPath, { recursive: true, force: true });
+        }
+        continue;
+      }
+      if (existsSync(repoPath)) {
+        rmSync(repoPath, { recursive: true, force: true });
+      }
+      throw new Error(`Failed to clone repo "${project.repo}": ${msg}`, { cause: err });
+    }
+  }
+
+  const msg = lastError instanceof Error ? lastError.message : String(lastError ?? "");
+  throw new Error(`Failed to clone repo "${project.repo}": ${msg}`);
+}
+
+async function resolveLocalDefaultBranch(
+  repoPath: string,
+  defaultBranch: string,
+): Promise<string> {
+  const candidates = dedupeBranches([defaultBranch, ...DEFAULT_BRANCH_FALLBACKS]);
+  for (const candidate of candidates) {
+    try {
+      const ref = `refs/heads/${candidate}`;
+      const result = await git(repoPath, "rev-parse", "--verify", "--quiet", ref);
+      if (result) return candidate;
+    } catch {
+      // Ignore and continue
+    }
+  }
+  return candidates[0] ?? "main";
+}
+
 export function create(config?: Record<string, unknown>): Workspace {
   const cloneBaseDir = config?.cloneDir
     ? expandPath(config.cloneDir as string)
@@ -56,6 +186,7 @@ export function create(config?: Record<string, unknown>): Workspace {
       assertSafePathSegment(cfg.sessionId, "sessionId");
 
       const repoPath = expandPath(cfg.project.path);
+      await ensureRepoAvailable(repoPath, cfg.project);
       const projectCloneDir = join(cloneBaseDir, cfg.projectId);
       const clonePath = join(projectCloneDir, cfg.sessionId);
 
@@ -78,6 +209,11 @@ export function create(config?: Record<string, unknown>): Workspace {
         );
       }
 
+      const baseBranch = await resolveLocalDefaultBranch(
+        repoPath,
+        cfg.project.defaultBranch,
+      );
+
       // Clone using --reference for faster clone with shared objects
       try {
         await execFileAsync("git", [
@@ -85,7 +221,7 @@ export function create(config?: Record<string, unknown>): Workspace {
           "--reference",
           repoPath,
           "--branch",
-          cfg.project.defaultBranch,
+          baseBranch,
           remoteUrl,
           clonePath,
         ]);

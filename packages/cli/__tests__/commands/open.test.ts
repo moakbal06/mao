@@ -20,7 +20,7 @@ vi.mock("../../src/lib/shell.js", () => ({
   getTmuxActivity: vi.fn().mockResolvedValue(null),
 }));
 
-vi.mock("@composio/ao-core", () => ({
+vi.mock("@moakbal/mao-core", () => ({
   loadConfig: () => mockConfigRef.current,
 }));
 

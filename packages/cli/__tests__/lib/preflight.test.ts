@@ -55,9 +55,9 @@ describe("preflight.checkBuilt", () => {
   });
 
   it("finds ao-core when hoisted one level up (npm global install layout)", async () => {
-    // /web/node_modules/@composio/ao-core     — miss
-    // /node_modules/@composio/ao-core         — hit
-    // /node_modules/@composio/ao-core/dist/index.js — exists
+    // /web/node_modules/@moakbal/mao-core     — miss
+    // /node_modules/@moakbal/mao-core         — hit
+    // /node_modules/@moakbal/mao-core/dist/index.js — exists
     mockExistsSync
       .mockReturnValueOnce(false)
       .mockReturnValueOnce(true)
@@ -68,8 +68,8 @@ describe("preflight.checkBuilt", () => {
   it("throws npm hint when ao-core not found in global install", async () => {
     mockExistsSync.mockReturnValue(false);
     await expect(
-      preflight.checkBuilt("/usr/local/lib/node_modules/@composio/ao-web"),
-    ).rejects.toThrow("npm install -g @composio/ao@latest");
+      preflight.checkBuilt("/usr/local/lib/node_modules/@moakbal/mao-web"),
+    ).rejects.toThrow("npm install -g @moakbal/mao@latest");
   });
 
   it("throws pnpm hint when ao-core not found in monorepo", async () => {

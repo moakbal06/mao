@@ -35,7 +35,7 @@ importers:
 
   packages/ao:
     dependencies:
-      '@composio/ao-cli':
+      '@moakbal/mao-cli':
         specifier: workspace:*
         version: link:../cli
 
@@ -44,67 +44,70 @@ importers:
       '@clack/prompts':
         specifier: ^0.9.1
         version: 0.9.1
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../core
-      '@composio/ao-plugin-agent-aider':
+      '@moakbal/mao-plugin-agent-aider':
         specifier: workspace:*
         version: link:../plugins/agent-aider
-      '@composio/ao-plugin-agent-claude-code':
+      '@moakbal/mao-plugin-agent-claude-code':
         specifier: workspace:*
         version: link:../plugins/agent-claude-code
-      '@composio/ao-plugin-agent-codex':
+      '@moakbal/mao-plugin-agent-codex':
         specifier: workspace:*
         version: link:../plugins/agent-codex
-      '@composio/ao-plugin-agent-opencode':
+      '@moakbal/mao-plugin-agent-opencode':
         specifier: workspace:*
         version: link:../plugins/agent-opencode
-      '@composio/ao-plugin-notifier-composio':
+      '@moakbal/mao-plugin-notifier-composio':
         specifier: workspace:*
         version: link:../plugins/notifier-composio
-      '@composio/ao-plugin-notifier-desktop':
+      '@moakbal/mao-plugin-notifier-desktop':
         specifier: workspace:*
         version: link:../plugins/notifier-desktop
-      '@composio/ao-plugin-notifier-discord':
+      '@moakbal/mao-plugin-notifier-discord':
         specifier: workspace:*
         version: link:../plugins/notifier-discord
-      '@composio/ao-plugin-notifier-openclaw':
+      '@moakbal/mao-plugin-notifier-openclaw':
         specifier: workspace:*
         version: link:../plugins/notifier-openclaw
-      '@composio/ao-plugin-notifier-slack':
+      '@moakbal/mao-plugin-notifier-slack':
         specifier: workspace:*
         version: link:../plugins/notifier-slack
-      '@composio/ao-plugin-notifier-webhook':
+      '@moakbal/mao-plugin-notifier-webhook':
         specifier: workspace:*
         version: link:../plugins/notifier-webhook
-      '@composio/ao-plugin-runtime-process':
+      '@moakbal/mao-plugin-runtime-process':
         specifier: workspace:*
         version: link:../plugins/runtime-process
-      '@composio/ao-plugin-runtime-tmux':
+      '@moakbal/mao-plugin-runtime-tmux':
         specifier: workspace:*
         version: link:../plugins/runtime-tmux
-      '@composio/ao-plugin-scm-github':
+      '@moakbal/mao-plugin-scm-github':
         specifier: workspace:*
         version: link:../plugins/scm-github
-      '@composio/ao-plugin-terminal-iterm2':
+      '@moakbal/mao-plugin-terminal-iterm2':
         specifier: workspace:*
         version: link:../plugins/terminal-iterm2
-      '@composio/ao-plugin-terminal-web':
+      '@moakbal/mao-plugin-terminal-web':
         specifier: workspace:*
         version: link:../plugins/terminal-web
-      '@composio/ao-plugin-tracker-github':
+      '@moakbal/mao-plugin-tracker-github':
         specifier: workspace:*
         version: link:../plugins/tracker-github
-      '@composio/ao-plugin-tracker-linear':
+      '@moakbal/mao-plugin-tracker-jira':
+        specifier: workspace:*
+        version: link:../plugins/tracker-jira
+      '@moakbal/mao-plugin-tracker-linear':
         specifier: workspace:*
         version: link:../plugins/tracker-linear
-      '@composio/ao-plugin-workspace-clone':
+      '@moakbal/mao-plugin-workspace-clone':
         specifier: workspace:*
         version: link:../plugins/workspace-clone
-      '@composio/ao-plugin-workspace-worktree':
+      '@moakbal/mao-plugin-workspace-worktree':
         specifier: workspace:*
         version: link:../plugins/workspace-worktree
-      '@composio/ao-web':
+      '@moakbal/mao-web':
         specifier: workspace:*
         version: link:../web
       chalk:
@@ -113,6 +116,9 @@ importers:
       commander:
         specifier: ^13.0.0
         version: 13.1.0
+      dotenv:
+        specifier: ^17.4.1
+        version: 17.4.1
       ora:
         specifier: ^8.1.0
         version: 8.2.0
@@ -163,56 +169,56 @@ importers:
 
   packages/integration-tests:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../core
-      '@composio/ao-plugin-agent-aider':
+      '@moakbal/mao-plugin-agent-aider':
         specifier: workspace:*
         version: link:../plugins/agent-aider
-      '@composio/ao-plugin-agent-claude-code':
+      '@moakbal/mao-plugin-agent-claude-code':
         specifier: workspace:*
         version: link:../plugins/agent-claude-code
-      '@composio/ao-plugin-agent-codex':
+      '@moakbal/mao-plugin-agent-codex':
         specifier: workspace:*
         version: link:../plugins/agent-codex
-      '@composio/ao-plugin-agent-opencode':
+      '@moakbal/mao-plugin-agent-opencode':
         specifier: workspace:*
         version: link:../plugins/agent-opencode
-      '@composio/ao-plugin-runtime-process':
+      '@moakbal/mao-plugin-runtime-process':
         specifier: workspace:*
         version: link:../plugins/runtime-process
-      '@composio/ao-plugin-runtime-tmux':
+      '@moakbal/mao-plugin-runtime-tmux':
         specifier: workspace:*
         version: link:../plugins/runtime-tmux
-      '@composio/ao-plugin-tracker-linear':
+      '@moakbal/mao-plugin-tracker-linear':
         specifier: workspace:*
         version: link:../plugins/tracker-linear
-      '@composio/ao-plugin-workspace-clone':
+      '@moakbal/mao-plugin-workspace-clone':
         specifier: workspace:*
         version: link:../plugins/workspace-clone
-      '@composio/ao-plugin-workspace-worktree':
+      '@moakbal/mao-plugin-workspace-worktree':
         specifier: workspace:*
         version: link:../plugins/workspace-worktree
     devDependencies:
-      '@composio/ao-plugin-notifier-composio':
+      '@moakbal/mao-plugin-notifier-composio':
         specifier: workspace:*
         version: link:../plugins/notifier-composio
-      '@composio/ao-plugin-notifier-desktop':
+      '@moakbal/mao-plugin-notifier-desktop':
         specifier: workspace:*
         version: link:../plugins/notifier-desktop
-      '@composio/ao-plugin-notifier-openclaw':
+      '@moakbal/mao-plugin-notifier-openclaw':
         specifier: workspace:*
         version: link:../plugins/notifier-openclaw
-      '@composio/ao-plugin-notifier-slack':
+      '@moakbal/mao-plugin-notifier-slack':
         specifier: workspace:*
         version: link:../plugins/notifier-slack
-      '@composio/ao-plugin-notifier-webhook':
+      '@moakbal/mao-plugin-notifier-webhook':
         specifier: workspace:*
         version: link:../plugins/notifier-webhook
-      '@composio/ao-plugin-terminal-iterm2':
+      '@moakbal/mao-plugin-terminal-iterm2':
         specifier: workspace:*
         version: link:../plugins/terminal-iterm2
-      '@composio/ao-plugin-terminal-web':
+      '@moakbal/mao-plugin-terminal-web':
         specifier: workspace:*
         version: link:../plugins/terminal-web
       '@types/node':
@@ -230,7 +236,7 @@ importers:
 
   packages/plugins/agent-aider:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -246,7 +252,7 @@ importers:
 
   packages/plugins/agent-claude-code:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -262,7 +268,7 @@ importers:
 
   packages/plugins/agent-codex:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -278,7 +284,7 @@ importers:
 
   packages/plugins/agent-opencode:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -294,7 +300,7 @@ importers:
 
   packages/plugins/notifier-composio:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
       composio-core:
@@ -313,7 +319,7 @@ importers:
 
   packages/plugins/notifier-desktop:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -329,7 +335,7 @@ importers:
 
   packages/plugins/notifier-discord:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -348,7 +354,7 @@ importers:
 
   packages/plugins/notifier-openclaw:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -364,7 +370,7 @@ importers:
 
   packages/plugins/notifier-slack:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -380,7 +386,7 @@ importers:
 
   packages/plugins/notifier-webhook:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -396,7 +402,7 @@ importers:
 
   packages/plugins/runtime-process:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -412,7 +418,7 @@ importers:
 
   packages/plugins/runtime-tmux:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -428,7 +434,7 @@ importers:
 
   packages/plugins/scm-github:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -444,7 +450,7 @@ importers:
 
   packages/plugins/scm-gitlab:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -460,7 +466,7 @@ importers:
 
   packages/plugins/terminal-iterm2:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -476,7 +482,7 @@ importers:
 
   packages/plugins/terminal-web:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -492,7 +498,7 @@ importers:
 
   packages/plugins/tracker-github:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -508,10 +514,10 @@ importers:
 
   packages/plugins/tracker-gitlab:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
-      '@composio/ao-plugin-scm-gitlab':
+      '@moakbal/mao-plugin-scm-gitlab':
         specifier: workspace:*
         version: link:../scm-gitlab
     devDependencies:
@@ -525,9 +531,25 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@25.2.3)(jiti@2.6.1)(jsdom@25.0.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2)
 
+  packages/plugins/tracker-jira:
+    dependencies:
+      '@moakbal/mao-core':
+        specifier: workspace:*
+        version: link:../../core
+    devDependencies:
+      '@types/node':
+        specifier: ^25.2.3
+        version: 25.2.3
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@25.2.3)(jiti@2.6.1)(jsdom@25.0.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2)
+
   packages/plugins/tracker-linear:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -543,7 +565,7 @@ importers:
 
   packages/plugins/workspace-clone:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -559,7 +581,7 @@ importers:
 
   packages/plugins/workspace-worktree:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../../core
     devDependencies:
@@ -575,28 +597,28 @@ importers:
 
   packages/web:
     dependencies:
-      '@composio/ao-core':
+      '@moakbal/mao-core':
         specifier: workspace:*
         version: link:../core
-      '@composio/ao-plugin-agent-claude-code':
+      '@moakbal/mao-plugin-agent-claude-code':
         specifier: workspace:*
         version: link:../plugins/agent-claude-code
-      '@composio/ao-plugin-agent-opencode':
+      '@moakbal/mao-plugin-agent-opencode':
         specifier: workspace:*
         version: link:../plugins/agent-opencode
-      '@composio/ao-plugin-runtime-tmux':
+      '@moakbal/mao-plugin-runtime-tmux':
         specifier: workspace:*
         version: link:../plugins/runtime-tmux
-      '@composio/ao-plugin-scm-github':
+      '@moakbal/mao-plugin-scm-github':
         specifier: workspace:*
         version: link:../plugins/scm-github
-      '@composio/ao-plugin-tracker-github':
+      '@moakbal/mao-plugin-tracker-github':
         specifier: workspace:*
         version: link:../plugins/tracker-github
-      '@composio/ao-plugin-tracker-linear':
+      '@moakbal/mao-plugin-tracker-linear':
         specifier: workspace:*
         version: link:../plugins/tracker-linear
-      '@composio/ao-plugin-workspace-worktree':
+      '@moakbal/mao-plugin-workspace-worktree':
         specifier: workspace:*
         version: link:../plugins/workspace-worktree
       '@xterm/addon-fit':
@@ -2435,6 +2457,10 @@ packages:
 
   dom-accessibility-api@0.6.3:
     resolution: {integrity: sha512-7ZgogeTnjuHbo+ct10G9Ffp0mif17idi0IyWNVA/wcwcm7NPOD/WEHVP3n7n3MhXqxoIYm8d6MuZohYWIZ4T3w==}
+
+  dotenv@17.4.1:
+    resolution: {integrity: sha512-k8DaKGP6r1G30Lx8V4+pCsLzKr8vLmV2paqEj1Y55GdAgJuIqpRp5FfajGF8KtwMxCz9qJc6wUIJnm053d/WCw==}
+    engines: {node: '>=12'}
 
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
@@ -5862,6 +5888,8 @@ snapshots:
   dom-accessibility-api@0.5.16: {}
 
   dom-accessibility-api@0.6.3: {}
+
+  dotenv@17.4.1: {}
 
   dunder-proto@1.0.1:
     dependencies:

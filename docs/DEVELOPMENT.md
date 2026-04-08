@@ -79,7 +79,7 @@ Activity states (orthogonal to lifecycle): `active`, `ready`, `idle`, `waiting_i
 **Prerequisites**: Node.js 20+, pnpm 9.15+, Git 2.25+
 
 ```bash
-git clone https://github.com/ComposioHQ/agent-orchestrator.git
+git clone https://github.com/moakbal06/mao.git
 cd agent-orchestrator
 pnpm install
 pnpm build
@@ -158,7 +158,7 @@ git status --short --branch   # `ao update` expects a clean working tree on main
 ao update
 ```
 
-`ao update` is intentionally conservative: it fast-forwards the local install checkout from `origin/main`, runs `pnpm install`, clean-rebuilds `@composio/ao-core`, `@composio/ao-cli`, and `@composio/ao-web`, refreshes the global launcher with `npm link`, and ends with CLI smoke tests. Use `ao update --skip-smoke` to stop after the rebuild, or `ao update --smoke-only` to rerun the smoke checks without fetching or rebuilding.
+`ao update` is intentionally conservative: it fast-forwards the local install checkout from `origin/main`, runs `pnpm install`, clean-rebuilds `@moakbal/mao-core`, `@moakbal/mao-cli`, and `@moakbal/mao-web`, refreshes the global launcher with `npm link`, and ends with CLI smoke tests. Use `ao update --skip-smoke` to stop after the rebuild, or `ao update --smoke-only` to rerun the smoke checks without fetching or rebuilding.
 
 If your branch has drift from `main`, update the install checkout first and then return to your feature worktree. That keeps CLI behavior and generated docs aligned with the version contributors are expected to run.
 
@@ -185,7 +185,7 @@ function processInput(value: unknown): string {
 }
 
 // Type-only imports for type-only usage
-import type { PluginModule, Runtime } from "@composio/ao-core";
+import type { PluginModule, Runtime } from "@moakbal/mao-core";
 ```
 
 Formatting: semicolons, double quotes, 2-space indent, strict mode.
@@ -223,7 +223,7 @@ A plugin exports a `manifest`, a `create()` factory, and a default `PluginModule
 
 ```typescript
 // packages/plugins/runtime-myplugin/src/index.ts
-import type { PluginModule, Runtime } from "@composio/ao-core";
+import type { PluginModule, Runtime } from "@moakbal/mao-core";
 
 export const manifest = {
   name: "myplugin",
@@ -257,7 +257,7 @@ export default { manifest, create } satisfies PluginModule<Runtime>;
 
 ```json
 {
-  "name": "@composio/ao-runtime-myplugin",
+  "name": "@moakbal/mao-runtime-myplugin",
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
@@ -268,7 +268,7 @@ export default { manifest, create } satisfies PluginModule<Runtime>;
     "test": "vitest"
   },
   "dependencies": {
-    "@composio/ao-core": "workspace:*"
+    "@moakbal/mao-core": "workspace:*"
   }
 }
 ```
@@ -318,10 +318,10 @@ Orchestrator sessions use a separate prompt from `packages/core/src/orchestrator
 pnpm test
 
 # Run tests for a specific package
-pnpm --filter @composio/ao-core test
+pnpm --filter @moakbal/mao-core test
 
 # Watch mode
-pnpm --filter @composio/ao-core test -- --watch
+pnpm --filter @moakbal/mao-core test -- --watch
 
 # Integration tests
 pnpm test:integration
@@ -344,7 +344,7 @@ Use mock plugins in tests — don't call real tmux or external services in unit 
 
 1. Edit `Session` interface in `packages/core/src/types.ts`
 2. Initialize the field in `spawn()` in `session-manager.ts`
-3. Rebuild: `pnpm --filter @composio/ao-core build`
+3. Rebuild: `pnpm --filter @moakbal/mao-core build`
 
 ### Add a new reaction
 
@@ -388,8 +388,8 @@ This project uses itself to develop itself — agents work in git worktrees:
 
 ```bash
 # Create a worktree for a feature branch
-git worktree add ../ao-feature-x feat/feature-x
-cd ../ao-feature-x
+git worktree add ../mao-feature-x feat/feature-x
+cd ../mao-feature-x
 
 # Install and build in the worktree
 pnpm install
@@ -449,7 +449,7 @@ Store in `.env.local` (gitignored). Never commit real values.
 ## Key Design Decisions
 
 **Why flat metadata files instead of a database?**
-Debuggability: `cat ~/.agent-orchestrator/a3b4-myapp/sessions/ao-1` shows full state. No database to spin up, no schema to migrate, survives crashes.
+Debuggability: `cat ~/.agent-orchestrator/a3b4-myapp/sessions/mao-1` shows full state. No database to spin up, no schema to migrate, survives crashes.
 
 **Why polling instead of webhooks?**
 Simpler local setup (no ngrok), survives orchestrator restarts, works offline. CI/review state is fetched, not pushed.

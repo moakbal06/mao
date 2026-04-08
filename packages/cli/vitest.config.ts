@@ -20,35 +20,35 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: "@composio/ao-core/scm-webhook-utils",
+        find: "@moakbal/mao-core/scm-webhook-utils",
         replacement: resolve(__dirname, "../core/src/scm-webhook-utils.ts"),
       },
       {
-        find: "@composio/ao-core/types",
+        find: "@moakbal/mao-core/types",
         replacement: resolve(__dirname, "../core/src/types.ts"),
       },
       {
-        find: "@composio/ao-core",
+        find: "@moakbal/mao-core",
         replacement: resolve(__dirname, "../core/src/index.ts"),
       },
       {
-        find: "@composio/ao-plugin-agent-claude-code",
+        find: "@moakbal/mao-plugin-agent-claude-code",
         replacement: resolve(__dirname, "../plugins/agent-claude-code/src/index.ts"),
       },
       {
-        find: "@composio/ao-plugin-agent-codex",
+        find: "@moakbal/mao-plugin-agent-codex",
         replacement: resolve(__dirname, "../plugins/agent-codex/src/index.ts"),
       },
       {
-        find: "@composio/ao-plugin-agent-aider",
+        find: "@moakbal/mao-plugin-agent-aider",
         replacement: resolve(__dirname, "../plugins/agent-aider/src/index.ts"),
       },
       {
-        find: "@composio/ao-plugin-agent-opencode",
+        find: "@moakbal/mao-plugin-agent-opencode",
         replacement: resolve(__dirname, "../plugins/agent-opencode/src/index.ts"),
       },
       {
-        find: "@composio/ao-plugin-scm-github",
+        find: "@moakbal/mao-plugin-scm-github",
         replacement: resolve(__dirname, "../plugins/scm-github/src/index.ts"),
       },
     ],

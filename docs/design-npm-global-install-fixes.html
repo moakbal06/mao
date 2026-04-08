@@ -369,7 +369,7 @@
     from a fresh machine</strong>:
   </p>
 
-  <pre><code>npm install -g @composio/ao && ao start</code></pre>
+  <pre><code>npm install -g @moakbal/mao && ao start</code></pre>
 
   <p>
     <strong>This does not work.</strong> Multiple bugs cause <code>ao start</code> to fail after
@@ -392,7 +392,7 @@
   <!-- Command 1 -->
   <div class="flowchart">
     <div class="flow-section-label">COMMAND 1</div>
-    <div class="flow-node flow-cmd">npm install -g @composio/ao</div>
+    <div class="flow-node flow-cmd">npm install -g @moakbal/mao</div>
     <div class="flow-arrow"></div>
     <div class="flow-node flow-action">postinstall.js runs</div>
     <div class="flow-arrow"></div>
@@ -460,7 +460,7 @@
 
     <div style="margin-top:16px"></div>
     <div class="flow-arrow"></div>
-    <div class="flow-node flow-action">preflight.checkBuilt()<br><small style="color:var(--text-muted)">findPackageUp(@composio/ao-core)</small></div>
+    <div class="flow-node flow-action">preflight.checkBuilt()<br><small style="color:var(--text-muted)">findPackageUp(@moakbal/mao-core)</small></div>
     <div class="flow-arrow"></div>
     <div class="flow-node flow-action">start dashboard<br><small style="color:var(--text-muted)">Next.js + terminal servers (auto-restart)</small></div>
     <div class="flow-arrow"></div>
@@ -485,14 +485,14 @@
         <td>1</td>
         <td><code>checkBuilt()</code> hardcoded single-level path</td>
         <td><span class="badge badge-p0">P0</span></td>
-        <td><a href="https://github.com/ComposioHQ/agent-orchestrator/issues/619">#619</a></td>
+        <td><a href="https://github.com/moakbal06/mao/issues/619">#619</a></td>
         <td>All npm/yarn global installs</td>
       </tr>
       <tr>
         <td>2</td>
         <td>node-pty <code>spawn-helper</code> missing execute bit</td>
         <td><span class="badge badge-p0">P0</span></td>
-        <td><a href="https://github.com/ComposioHQ/agent-orchestrator/issues/624">#624</a></td>
+        <td><a href="https://github.com/moakbal06/mao/issues/624">#624</a></td>
         <td>macOS + Linux npm installs</td>
       </tr>
       <tr>
@@ -506,7 +506,7 @@
         <td>4</td>
         <td>Terminal server crash is permanent (no restart), bookkeeping bug on restart</td>
         <td><span class="badge badge-p1">P1</span></td>
-        <td>Related to <a href="https://github.com/ComposioHQ/agent-orchestrator/issues/489">#489</a></td>
+        <td>Related to <a href="https://github.com/moakbal06/mao/issues/489">#489</a></td>
         <td>linux-arm64 (AWS Graviton)</td>
       </tr>
     </tbody>
@@ -519,7 +519,7 @@
 
   <h3>Root Cause</h3>
   <p>
-    <code>preflight.ts</code> verifies <code>@composio/ao-core</code> exists using a single hardcoded path:
+    <code>preflight.ts</code> verifies <code>@moakbal/mao-core</code> exists using a single hardcoded path:
   </p>
 
   <pre><code>// BEFORE: only checks one level deep
@@ -536,7 +536,7 @@ const nodeModules = resolve(webDir, "node_modules", "@composio", "ao-core");</co
       <h4>pnpm layout (works)</h4>
       <pre><code>packages/web/
   node_modules/
-    @composio/ao-core -> ../../core</code></pre>
+    @moakbal/mao-core -> ../../core</code></pre>
     </div>
     <div class="after">
       <h4>npm global layout (broken)</h4>
@@ -549,7 +549,7 @@ const nodeModules = resolve(webDir, "node_modules", "@composio", "ao-core");</co
   <h3>Fix</h3>
   <p>
     Replace with <code>findPackageUp()</code> &mdash; walks up directories checking
-    <code>node_modules/@composio/ao-core</code> at each level, mirroring Node's own resolution:
+    <code>node_modules/@moakbal/mao-core</code> at each level, mirroring Node's own resolution:
   </p>
 
   <pre><code>function findPackageUp(startDir: string, ...segments: string[]): string | null {
@@ -566,7 +566,7 @@ const nodeModules = resolve(webDir, "node_modules", "@composio", "ao-core");</co
 
   <p>Error messages distinguish install method:</p>
   <ul>
-    <li>Path contains <code>node_modules</code> &rarr; <code>"npm install -g @composio/ao@latest"</code></li>
+    <li>Path contains <code>node_modules</code> &rarr; <code>"npm install -g @moakbal/mao@latest"</code></li>
     <li>Otherwise &rarr; <code>"pnpm install && pnpm build"</code></li>
   </ul>
 
@@ -586,7 +586,7 @@ const nodeModules = resolve(webDir, "node_modules", "@composio", "ao-core");</co
 
   <h3>Fix</h3>
   <p>
-    New <code>packages/ao/bin/postinstall.js</code> runs after <code>npm install -g @composio/ao</code>.
+    New <code>packages/ao/bin/postinstall.js</code> runs after <code>npm install -g @moakbal/mao</code>.
     Uses the same <code>findPackageUp</code> pattern to locate node-pty, then <code>chmod 0o755</code>
     on <code>spawn-helper</code>. Skips on Windows, silent on failure.
   </p>
@@ -937,7 +937,7 @@ function launch(): ChildProcess {
   <!-- ================================================================ -->
   <h2>9. Post-Merge: True Two-Step Matrix</h2>
 
-  <p>After this PR, <code>npm install -g @composio/ao && ao start</code>:</p>
+  <p>After this PR, <code>npm install -g @moakbal/mao && ao start</code>:</p>
 
   <table>
     <thead>

@@ -4,12 +4,12 @@ import {
   type OrchestratorEvent,
   type NotifyAction,
   type NotifyContext,
-} from "@composio/ao-core";
+} from "@moakbal/mao-core";
 import {
   isRetryableHttpStatus,
   normalizeRetryConfig,
   validateUrl,
-} from "@composio/ao-core/utils";
+} from "@moakbal/mao-core/utils";
 
 export const manifest = {
   name: "webhook",

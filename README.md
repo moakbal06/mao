@@ -10,11 +10,11 @@
 
 Spawn parallel AI coding agents, each in its own git worktree. Agents autonomously fix CI failures, address review comments, and open PRs — you supervise from one dashboard.
 
-[![GitHub stars](https://img.shields.io/github/stars/ComposioHQ/agent-orchestrator?style=flat-square)](https://github.com/ComposioHQ/agent-orchestrator/stargazers)
-[![npm version](https://img.shields.io/npm/v/%40composio%2Fao?style=flat-square)](https://www.npmjs.com/package/@composio/ao)
+[![GitHub stars](https://img.shields.io/github/stars/moakbal06/mao?style=flat-square)](https://github.com/moakbal06/mao/stargazers)
+[![npm version](https://img.shields.io/npm/v/%40moakbal%2Fmao?style=flat-square)](https://www.npmjs.com/package/@moakbal/mao)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
-[![PRs merged](https://img.shields.io/badge/PRs_merged-61-brightgreen?style=flat-square)](https://github.com/ComposioHQ/agent-orchestrator/pulls?q=is%3Amerged)
-[![Tests](https://img.shields.io/badge/test_cases-3%2C288-blue?style=flat-square)](https://github.com/ComposioHQ/agent-orchestrator/releases/tag/metrics-v1)
+[![PRs merged](https://img.shields.io/badge/PRs_merged-61-brightgreen?style=flat-square)](https://github.com/moakbal06/mao/pulls?q=is%3Amerged)
+[![Tests](https://img.shields.io/badge/test_cases-3%2C288-blue?style=flat-square)](https://github.com/moakbal06/mao/releases/tag/metrics-v1)
 [![Discord](https://img.shields.io/badge/Discord-Join%20Community-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/UZv7JjxbwG)
 
 </div>
@@ -50,7 +50,7 @@ Agent Orchestrator manages fleets of AI coding agents working in parallel on you
 ### Install
 
 ```bash
-npm install -g @composio/ao
+npm install -g @moakbal/mao
 ```
 
 <details>
@@ -61,7 +61,7 @@ If `npm install -g` fails with EACCES, prefix with `sudo` or [fix your npm permi
 To install from source (for contributors):
 
 ```bash
-git clone https://github.com/ComposioHQ/agent-orchestrator.git
+git clone https://github.com/moakbal06/mao.git
 cd agent-orchestrator && bash scripts/setup.sh
 ```
 </details>

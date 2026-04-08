@@ -1,7 +1,7 @@
 [
   {
     "id": "agent-codex",
-    "package": "@composio/ao-plugin-agent-codex",
+    "package": "@moakbal/mao-plugin-agent-codex",
     "slot": "agent",
     "description": "Agent plugin: OpenAI Codex CLI",
     "source": "registry",
@@ -9,7 +9,7 @@
   },
   {
     "id": "agent-aider",
-    "package": "@composio/ao-plugin-agent-aider",
+    "package": "@moakbal/mao-plugin-agent-aider",
     "slot": "agent",
     "description": "Agent plugin: Aider CLI",
     "source": "registry",
@@ -17,7 +17,7 @@
   },
   {
     "id": "agent-opencode",
-    "package": "@composio/ao-plugin-agent-opencode",
+    "package": "@moakbal/mao-plugin-agent-opencode",
     "slot": "agent",
     "description": "Agent plugin: OpenCode CLI",
     "source": "registry",
@@ -25,7 +25,7 @@
   },
   {
     "id": "notifier-openclaw",
-    "package": "@composio/ao-plugin-notifier-openclaw",
+    "package": "@moakbal/mao-plugin-notifier-openclaw",
     "slot": "notifier",
     "description": "Notifier plugin: OpenClaw webhook notifications",
     "source": "registry",
@@ -34,7 +34,7 @@
   },
   {
     "id": "notifier-discord",
-    "package": "@composio/ao-plugin-notifier-discord",
+    "package": "@moakbal/mao-plugin-notifier-discord",
     "slot": "notifier",
     "description": "Notifier plugin: Discord notifications",
     "source": "registry",
@@ -42,15 +42,23 @@
   },
   {
     "id": "tracker-gitlab",
-    "package": "@composio/ao-plugin-tracker-gitlab",
+    "package": "@moakbal/mao-plugin-tracker-gitlab",
     "slot": "tracker",
     "description": "Tracker plugin: GitLab issues",
     "source": "registry",
     "latestVersion": "0.1.1"
   },
   {
+    "id": "tracker-jira",
+    "package": "@moakbal/mao-plugin-tracker-jira",
+    "slot": "tracker",
+    "description": "Tracker plugin: Jira (Atlassian)",
+    "source": "registry",
+    "latestVersion": "0.1.0"
+  },
+  {
     "id": "scm-gitlab",
-    "package": "@composio/ao-plugin-scm-gitlab",
+    "package": "@moakbal/mao-plugin-scm-gitlab",
     "slot": "scm",
     "description": "SCM plugin: GitLab pull/merge requests",
     "source": "registry",

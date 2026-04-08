@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-import "@composio/ao-cli";
+import "@moakbal/mao-cli";

@@ -23,9 +23,9 @@ import {
   readLastJsonlEntry,
   type ActivityDetection,
   type AgentSessionInfo,
-} from "@composio/ao-core";
+} from "@moakbal/mao-core";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import claudeCodePlugin, { toClaudeProjectPath } from "@composio/ao-plugin-agent-claude-code";
+import claudeCodePlugin, { toClaudeProjectPath } from "@moakbal/mao-plugin-agent-claude-code";
 import {
   isTmuxAvailable,
   killSessionsByPrefix,

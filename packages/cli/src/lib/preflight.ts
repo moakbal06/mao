@@ -27,7 +27,7 @@ async function checkPort(port: number): Promise<void> {
 
 /**
  * Check that workspace packages have been compiled (TypeScript → JavaScript).
- * Locates @composio/ao-core by walking up from webDir, handling both pnpm
+ * Locates @moakbal/mao-core by walking up from webDir, handling both pnpm
  * workspaces (symlinked deps in webDir/node_modules) and npm/yarn global
  * installs (hoisted to a parent node_modules).
  */
@@ -35,14 +35,14 @@ async function checkBuilt(webDir: string): Promise<void> {
   const corePkgDir = findPackageUp(webDir, "@composio", "ao-core");
   if (!corePkgDir) {
     const hint = webDir.includes("node_modules")
-      ? "Run: npm install -g @composio/ao@latest"
+      ? "Run: npm install -g @moakbal/mao@latest"
       : "Run: pnpm install && pnpm build";
     throw new Error(`Dependencies not installed. ${hint}`);
   }
   const coreEntry = resolve(corePkgDir, "dist", "index.js");
   if (!existsSync(coreEntry)) {
     const hint = webDir.includes("node_modules")
-      ? "Run: npm install -g @composio/ao@latest"
+      ? "Run: npm install -g @moakbal/mao@latest"
       : "Run: pnpm build";
     throw new Error(`Packages not built. ${hint}`);
   }

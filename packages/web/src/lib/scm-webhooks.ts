@@ -7,7 +7,7 @@ import {
   type SCMWebhookEvent,
   type SCMWebhookRequest,
   type Session,
-} from "@composio/ao-core";
+} from "@moakbal/mao-core";
 
 export interface WebhookProjectMatch {
   projectId: string;

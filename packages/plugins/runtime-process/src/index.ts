@@ -6,7 +6,7 @@ import type {
   RuntimeHandle,
   RuntimeMetrics,
   AttachInfo,
-} from "@composio/ao-core";
+} from "@moakbal/mao-core";
 
 export const manifest = {
   name: "process",

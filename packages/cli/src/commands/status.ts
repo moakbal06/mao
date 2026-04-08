@@ -12,7 +12,7 @@ import {
   type ProjectConfig,
   isOrchestratorSession,
   loadConfig,
-} from "@composio/ao-core";
+} from "@moakbal/mao-core";
 import { git, getTmuxSessions, getTmuxActivity } from "../lib/shell.js";
 import {
   banner,

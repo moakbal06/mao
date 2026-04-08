@@ -541,7 +541,7 @@ git push origin fix-runtime-terminal-projectid-hardening
 ls .changeset/five-lamps-heal.md
 
 # 3) CI validation (already required by repo workflows)
-pnpm --filter @composio/ao-web test -- \
+pnpm --filter @moakbal/mao-web test -- \
   src/__tests__/api-routes.test.ts \
   src/lib/__tests__/dashboard-page-data.test.ts \
   src/components/__tests__/DirectTerminal.test.ts
@@ -557,7 +557,7 @@ git commit -m "chore(release): version packages for runtime terminal + spawn har
 pnpm release
 
 # 7) Post-release smoke check
-npm i -g @composio/ao@latest
+npm i -g @moakbal/mao@latest
 ao start &lt;project-path&gt;
 # verify terminal works when direct terminal port is non-default</code></pre>
 

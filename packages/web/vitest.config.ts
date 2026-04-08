@@ -17,37 +17,37 @@ export default defineConfig({
   },
   resolve: {
     alias: [
-      { find: "@composio/ao-core/types", replacement: resolve(__dirname, "../core/src/types.ts") },
+      { find: "@moakbal/mao-core/types", replacement: resolve(__dirname, "../core/src/types.ts") },
       {
-        find: "@composio/ao-core",
+        find: "@moakbal/mao-core",
         replacement: resolve(__dirname, "../core/src/index.ts"),
       },
       {
-        find: "@composio/ao-plugin-runtime-tmux",
+        find: "@moakbal/mao-plugin-runtime-tmux",
         replacement: resolve(__dirname, "../plugins/runtime-tmux/src/index.ts"),
       },
       {
-        find: "@composio/ao-plugin-agent-claude-code",
+        find: "@moakbal/mao-plugin-agent-claude-code",
         replacement: resolve(__dirname, "../plugins/agent-claude-code/src/index.ts"),
       },
       {
-        find: "@composio/ao-plugin-agent-opencode",
+        find: "@moakbal/mao-plugin-agent-opencode",
         replacement: resolve(__dirname, "../plugins/agent-opencode/src/index.ts"),
       },
       {
-        find: "@composio/ao-plugin-workspace-worktree",
+        find: "@moakbal/mao-plugin-workspace-worktree",
         replacement: resolve(__dirname, "../plugins/workspace-worktree/src/index.ts"),
       },
       {
-        find: "@composio/ao-plugin-scm-github",
+        find: "@moakbal/mao-plugin-scm-github",
         replacement: resolve(__dirname, "../plugins/scm-github/src/index.ts"),
       },
       {
-        find: "@composio/ao-plugin-tracker-github",
+        find: "@moakbal/mao-plugin-tracker-github",
         replacement: resolve(__dirname, "../plugins/tracker-github/src/index.ts"),
       },
       {
-        find: "@composio/ao-plugin-tracker-linear",
+        find: "@moakbal/mao-plugin-tracker-linear",
         replacement: resolve(__dirname, "../plugins/tracker-linear/src/index.ts"),
       },
       { find: "@", replacement: resolve(__dirname, "./src") },

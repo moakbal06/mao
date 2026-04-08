@@ -4,7 +4,7 @@ import {
   resolveProjectIdForSessionId,
   type OrchestratorConfig,
   type ProjectObserver,
-} from "@composio/ao-core";
+} from "@moakbal/mao-core";
 
 export function createObserverContext(surface: string): {
   config: OrchestratorConfig | undefined;

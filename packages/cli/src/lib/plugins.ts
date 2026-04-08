@@ -1,9 +1,9 @@
-import type { Agent, OrchestratorConfig, PluginRegistry, SCM } from "@composio/ao-core";
-import claudeCodePlugin from "@composio/ao-plugin-agent-claude-code";
-import codexPlugin from "@composio/ao-plugin-agent-codex";
-import aiderPlugin from "@composio/ao-plugin-agent-aider";
-import opencodePlugin from "@composio/ao-plugin-agent-opencode";
-import githubSCMPlugin from "@composio/ao-plugin-scm-github";
+import type { Agent, OrchestratorConfig, PluginRegistry, SCM } from "@moakbal/mao-core";
+import claudeCodePlugin from "@moakbal/mao-plugin-agent-claude-code";
+import codexPlugin from "@moakbal/mao-plugin-agent-codex";
+import aiderPlugin from "@moakbal/mao-plugin-agent-aider";
+import opencodePlugin from "@moakbal/mao-plugin-agent-opencode";
+import githubSCMPlugin from "@moakbal/mao-plugin-scm-github";
 
 const agentPlugins: Record<string, { create(): Agent }> = {
   "claude-code": claudeCodePlugin,

@@ -25,7 +25,7 @@ const { mockProbeGateway, mockValidateToken, mockDetectOpenClawInstallation } = 
   mockDetectOpenClawInstallation: vi.fn(),
 }));
 
-vi.mock("@composio/ao-core", () => ({
+vi.mock("@moakbal/mao-core", () => ({
   findConfigFile: (...args: unknown[]) => mockFindConfigFile(...args),
 }));
 

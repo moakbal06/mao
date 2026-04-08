@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { AgentLaunchConfig } from "@composio/ao-core";
-import codexPlugin from "@composio/ao-plugin-agent-codex";
+import type { AgentLaunchConfig } from "@moakbal/mao-core";
+import codexPlugin from "@moakbal/mao-plugin-agent-codex";
 
 function makeLaunchConfig(overrides: Partial<AgentLaunchConfig> = {}): AgentLaunchConfig {
   return {

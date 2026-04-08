@@ -10,6 +10,8 @@
  * bundle them correctly.
  */
 
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 import {
   loadConfig,
   createPluginRegistry,
@@ -32,16 +34,17 @@ import {
   DEFAULT_DECOMPOSER_CONFIG,
   isOrchestratorSession,
   TERMINAL_STATUSES,
-} from "@composio/ao-core";
+} from "@moakbal/mao-core";
 
 // Static plugin imports — webpack needs these to be string literals
-import pluginRuntimeTmux from "@composio/ao-plugin-runtime-tmux";
-import pluginAgentClaudeCode from "@composio/ao-plugin-agent-claude-code";
-import pluginAgentOpencode from "@composio/ao-plugin-agent-opencode";
-import pluginWorkspaceWorktree from "@composio/ao-plugin-workspace-worktree";
-import pluginScmGithub from "@composio/ao-plugin-scm-github";
-import pluginTrackerGithub from "@composio/ao-plugin-tracker-github";
-import pluginTrackerLinear from "@composio/ao-plugin-tracker-linear";
+import pluginRuntimeTmux from "@moakbal/mao-plugin-runtime-tmux";
+import pluginAgentClaudeCode from "@moakbal/mao-plugin-agent-claude-code";
+import pluginAgentOpencode from "@moakbal/mao-plugin-agent-opencode";
+import pluginWorkspaceWorktree from "@moakbal/mao-plugin-workspace-worktree";
+import pluginScmGithub from "@moakbal/mao-plugin-scm-github";
+import pluginTrackerGithub from "@moakbal/mao-plugin-tracker-github";
+import pluginTrackerJira from "@moakbal/mao-plugin-tracker-jira";
+import pluginTrackerLinear from "@moakbal/mao-plugin-tracker-linear";
 
 export interface Services {
   config: OrchestratorConfig;
@@ -55,6 +58,21 @@ const globalForServices = globalThis as typeof globalThis & {
   _aoServices?: Services;
   _aoServicesInit?: Promise<Services>;
 };
+
+function loadRootEnvIfNeeded(): void {
+  if (process.env.JIRA_BASE_URL) return;
+  const loadEnvFile = (process as { loadEnvFile?: (path?: string) => void }).loadEnvFile;
+  if (typeof loadEnvFile !== "function") return;
+
+  const rootEnv = resolve(process.cwd(), "..", "..", ".env");
+  if (!existsSync(rootEnv)) return;
+
+  try {
+    loadEnvFile(rootEnv);
+  } catch {
+    // Non-fatal: env remains unset, tracker calls will surface errors
+  }
+}
 
 /** Get (or lazily initialize) the core services singleton. */
 export function getServices(): Promise<Services> {
@@ -73,6 +91,7 @@ export function getServices(): Promise<Services> {
 }
 
 async function initServices(): Promise<Services> {
+  loadRootEnvIfNeeded();
   const config = loadConfig();
   const registry = createPluginRegistry();
 
@@ -83,6 +102,7 @@ async function initServices(): Promise<Services> {
   registry.register(pluginWorkspaceWorktree);
   registry.register(pluginScmGithub);
   registry.register(pluginTrackerGithub);
+  registry.register(pluginTrackerJira);
   registry.register(pluginTrackerLinear);
 
   const sessionManager = createSessionManager({ config, registry });

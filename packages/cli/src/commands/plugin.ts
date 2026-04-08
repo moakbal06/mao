@@ -8,7 +8,7 @@ import {
   type PluginSlot,
   type InstalledPluginConfig,
   type OrchestratorConfig,
-} from "@composio/ao-core";
+} from "@moakbal/mao-core";
 import { parseDocument } from "yaml";
 import {
   buildPluginDescriptor,

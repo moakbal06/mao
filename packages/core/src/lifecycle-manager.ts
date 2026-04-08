@@ -1302,6 +1302,37 @@ export function createLifecycleManager(deps: LifecycleManagerDeps): LifecycleMan
     try {
       const sessions = await sessionManager.list(scopedProjectId);
 
+      // --- Native Autonomous Tracker Polling ---
+      const activeIssueIds = new Set(sessions.map(s => `${s.projectId}:${s.issueId}`));
+      for (const [projectId, project] of Object.entries(config.projects)) {
+        if (scopedProjectId && scopedProjectId !== projectId) continue;
+        const trackerName = project.tracker?.plugin || config.defaults.tracker;
+        if (!trackerName) continue;
+        const tracker = registry.get<any>("tracker", trackerName);
+        if (tracker && typeof tracker.listIssues === "function") {
+          try {
+            const issues = await tracker.listIssues({ state: "open" }, project);
+            for (const issue of issues) {
+              const issueId = issue.id; // Correct extraction from standard Issue type
+              if (!issueId) continue;
+
+              const issueKey = `${projectId}:${issueId}`;
+              if (!activeIssueIds.has(issueKey)) {
+                console.log(`[LifecycleManager] Discovered new issue from tracker: ${issueId}. Spawning session natively...`);
+                await sessionManager.spawn({
+                  projectId,
+                  issueId: issueId,
+                });
+                activeIssueIds.add(issueKey);
+              }
+            }
+          } catch (err) {
+            console.error(`[LifecycleManager] Failed to poll tracker for project ${projectId}:`, err);
+          }
+        }
+      }
+      // -----------------------------------------
+
       // Include sessions that are active OR whose status changed from what we last saw
       // (e.g., list() detected a dead runtime and marked it "killed" — we need to
       // process that transition even though the new status is terminal)

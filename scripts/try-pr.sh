@@ -38,7 +38,7 @@ if [ "$2" = "--with-web" ]; then
   WITH_WEB=true
 fi
 
-WORKTREES_DIR="${AO_WORKTREES_DIR:-$HOME/.worktrees/ao}"
+WORKTREES_DIR="${AO_WORKTREES_DIR:-$HOME/.worktrees/mao}"
 WORKTREE="$WORKTREES_DIR/$SESSION"
 
 if [ ! -d "$WORKTREE" ]; then
@@ -55,15 +55,15 @@ cd "$WORKTREE"
 # ── build CLI/core/plugins ─────────────────────────────────────────────────────
 echo -e "\n${BOLD}Building $SESSION${RESET} (branch: ${CYAN}$BRANCH${RESET})\n"
 
-pnpm --filter @composio/ao-core \
-     --filter @composio/ao-cli \
-     --filter '@composio/ao-plugin-*' \
+pnpm --filter @moakbal/mao-core \
+     --filter @moakbal/mao-cli \
+     --filter '@moakbal/mao-plugin-*' \
      build
 
 # ── build web if requested ─────────────────────────────────────────────────────
 if [ "$WITH_WEB" = true ]; then
   echo -e "\n${BOLD}Building dashboard...${RESET}\n"
-  pnpm --filter @composio/ao-web build
+  pnpm --filter @moakbal/mao-web build
 fi
 
 # ── link ao ───────────────────────────────────────────────────────────────────

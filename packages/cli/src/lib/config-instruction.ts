@@ -86,7 +86,7 @@ projects:
 
     # ── Issue tracker (optional) ──────────────────────────────────
     tracker:
-      plugin: github          # github | linear | gitlab
+      plugin: github          # github | linear | jira | gitlab
       # Linear-specific:
       # teamId: TEAM-123
       # projectId: PROJECT-456

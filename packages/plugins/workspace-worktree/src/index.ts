@@ -9,10 +9,12 @@ import type {
   WorkspaceCreateConfig,
   WorkspaceInfo,
   ProjectConfig,
-} from "@composio/ao-core";
+} from "@moakbal/mao-core";
 
 /** Timeout for git commands (30 seconds) */
 const GIT_TIMEOUT = 30_000;
+
+const DEFAULT_BRANCH_FALLBACKS = ["main", "master"];
 
 const execFileAsync = promisify(execFile);
 
@@ -53,6 +55,7 @@ async function resolveBaseRef(
   options?: { branch?: string; hasOrigin?: boolean },
 ): Promise<string> {
   const hasOrigin = options?.hasOrigin ?? (await hasOriginRemote(repoPath));
+  const candidates = dedupeBranches([defaultBranch, ...DEFAULT_BRANCH_FALLBACKS]);
 
   if (hasOrigin) {
     if (options?.branch) {
@@ -60,14 +63,20 @@ async function resolveBaseRef(
       if (await refExists(repoPath, remoteBranch)) return remoteBranch;
     }
 
-    const remoteDefaultBranch = `origin/${defaultBranch}`;
-    if (await refExists(repoPath, remoteDefaultBranch)) return remoteDefaultBranch;
+    for (const candidate of candidates) {
+      const remoteDefaultBranch = `origin/${candidate}`;
+      if (await refExists(repoPath, remoteDefaultBranch)) return remoteDefaultBranch;
+    }
   }
 
-  const localDefaultBranch = `refs/heads/${defaultBranch}`;
-  if (await refExists(repoPath, localDefaultBranch)) return localDefaultBranch;
+  for (const candidate of candidates) {
+    const localDefaultBranch = `refs/heads/${candidate}`;
+    if (await refExists(repoPath, localDefaultBranch)) return localDefaultBranch;
+  }
 
-  throw new Error(`Unable to resolve base ref for default branch "${defaultBranch}"`);
+  throw new Error(
+    `Unable to resolve base ref for default branches: ${candidates.join(", ")}`,
+  );
 }
 
 /** Only allow safe characters in path segments to prevent directory traversal */
@@ -87,6 +96,139 @@ function expandPath(p: string): string {
   return p;
 }
 
+function dedupeBranches(branches: string[]): string[] {
+  const result: string[] = [];
+  const seen = new Set<string>();
+  for (const branch of branches) {
+    const trimmed = branch?.trim();
+    if (!trimmed || seen.has(trimmed)) continue;
+    seen.add(trimmed);
+    result.push(trimmed);
+  }
+  return result;
+}
+
+function normalizeRepoUrl(repo: string): string {
+  const trimmed = repo.trim();
+  const hasScheme = /^[a-z+]+:\/\//i.test(trimmed) || trimmed.startsWith("git@");
+  if (hasScheme) return trimmed;
+  const withGit = trimmed.endsWith(".git") ? trimmed : `${trimmed}.git`;
+  return `https://github.com/${withGit}`;
+}
+
+async function resolveRemoteDefaultBranch(
+  remoteUrl: string,
+  candidates: string[],
+): Promise<string | undefined> {
+  try {
+    const { stdout } = await execFileAsync(
+      "git",
+      ["ls-remote", "--symref", remoteUrl, "HEAD"],
+      { timeout: GIT_TIMEOUT },
+    );
+    const line = stdout
+      .split("\n")
+      .map((l) => l.trim())
+      .find((l) => l.startsWith("ref: "));
+    if (line) {
+      const tokens = line.split(" ").filter(Boolean);
+      const refToken = tokens[1];
+      if (refToken?.startsWith("refs/heads/")) {
+        return refToken.slice("refs/heads/".length);
+      }
+    }
+  } catch {
+    // Fall through to candidate probing
+  }
+
+  for (const candidate of candidates) {
+    try {
+      const { stdout } = await execFileAsync(
+        "git",
+        ["ls-remote", "--heads", remoteUrl, candidate],
+        { timeout: GIT_TIMEOUT },
+      );
+      if (stdout.trim().length > 0) return candidate;
+    } catch {
+      // Ignore and keep probing
+    }
+  }
+
+  return undefined;
+}
+
+async function ensureRepoAvailable(repoPath: string, project: ProjectConfig): Promise<void> {
+  if (existsSync(repoPath)) {
+    if (!lstatSync(repoPath).isDirectory()) {
+      throw new Error(`Project path "${repoPath}" exists but is not a directory`);
+    }
+    return;
+  }
+
+  if (!project.repo || typeof project.repo !== "string") {
+    throw new Error(
+      `Project path "${repoPath}" does not exist and no project.repo is configured to clone from`,
+    );
+  }
+
+  const remoteUrl = normalizeRepoUrl(project.repo);
+  const requested = project.defaultBranch || "main";
+  const candidates = dedupeBranches([requested, ...DEFAULT_BRANCH_FALLBACKS]);
+  const remoteDefault = await resolveRemoteDefaultBranch(remoteUrl, candidates);
+  const branchCandidates = dedupeBranches([
+    remoteDefault ?? "",
+    ...candidates,
+  ]);
+
+  mkdirSync(dirname(repoPath), { recursive: true });
+
+  let lastError: unknown;
+  for (const branch of branchCandidates) {
+    try {
+      await execFileAsync(
+        "git",
+        ["clone", "--branch", branch, remoteUrl, repoPath],
+        { timeout: GIT_TIMEOUT },
+      );
+      return;
+    } catch (err: unknown) {
+      lastError = err;
+      const msg = err instanceof Error ? err.message : String(err);
+      if (
+        msg.includes("Remote branch") ||
+        msg.includes("could not find remote branch") ||
+        msg.includes("not found") && msg.includes("branch")
+      ) {
+        if (existsSync(repoPath)) {
+          rmSync(repoPath, { recursive: true, force: true });
+        }
+        continue;
+      }
+      if (existsSync(repoPath)) {
+        rmSync(repoPath, { recursive: true, force: true });
+      }
+      throw new Error(`Failed to clone repo "${project.repo}": ${msg}`, { cause: err });
+    }
+  }
+
+  const msg = lastError instanceof Error ? lastError.message : String(lastError ?? "");
+  throw new Error(`Failed to clone repo "${project.repo}": ${msg}`);
+}
+
+async function resolveLocalDefaultBranch(
+  repoPath: string,
+  defaultBranch: string,
+): Promise<string> {
+  const candidates = dedupeBranches([defaultBranch, ...DEFAULT_BRANCH_FALLBACKS]);
+  for (const candidate of candidates) {
+    const ref = `refs/heads/${candidate}`;
+    if (await refExists(repoPath, ref)) return ref;
+  }
+  throw new Error(
+    `Unable to resolve local default branch from: ${candidates.join(", ")}`,
+  );
+}
+
 export function create(config?: Record<string, unknown>): Workspace {
   const worktreeBaseDir = config?.worktreeDir
     ? expandPath(config.worktreeDir as string)
@@ -100,6 +242,7 @@ export function create(config?: Record<string, unknown>): Workspace {
       assertSafePathSegment(cfg.sessionId, "sessionId");
 
       const repoPath = expandPath(cfg.project.path);
+      await ensureRepoAvailable(repoPath, cfg.project);
       const projectWorktreeDir = join(worktreeBaseDir, cfg.projectId);
       const worktreePath = join(projectWorktreeDir, cfg.sessionId);
 
@@ -253,6 +396,7 @@ export function create(config?: Record<string, unknown>): Workspace {
 
     async restore(cfg: WorkspaceCreateConfig, workspacePath: string): Promise<WorkspaceInfo> {
       const repoPath = expandPath(cfg.project.path);
+      await ensureRepoAvailable(repoPath, cfg.project);
 
       // Prune stale worktree entries
       try {
@@ -289,6 +433,10 @@ export function create(config?: Record<string, unknown>): Workspace {
           try {
             await git(repoPath, "worktree", "add", "-b", cfg.branch, workspacePath, baseRef);
           } catch {
+            const fallbackRef = await resolveLocalDefaultBranch(
+              repoPath,
+              cfg.project.defaultBranch,
+            );
             await git(
               repoPath,
               "worktree",
@@ -296,7 +444,7 @@ export function create(config?: Record<string, unknown>): Workspace {
               "-b",
               cfg.branch,
               workspacePath,
-              `refs/heads/${cfg.project.defaultBranch}`,
+              fallbackRef,
             );
           }
         }

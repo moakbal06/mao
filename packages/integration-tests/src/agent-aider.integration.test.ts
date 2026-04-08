@@ -14,9 +14,9 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
-import type { ActivityDetection, AgentSessionInfo } from "@composio/ao-core";
+import type { ActivityDetection, AgentSessionInfo } from "@moakbal/mao-core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import aiderPlugin from "@composio/ao-plugin-agent-aider";
+import aiderPlugin from "@moakbal/mao-plugin-agent-aider";
 import {
   isTmuxAvailable,
   killSessionsByPrefix,

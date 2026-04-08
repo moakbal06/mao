@@ -7,8 +7,8 @@ import {
   type NotifyContext,
   type EventPriority,
   CI_STATUS,
-} from "@composio/ao-core";
-import { isRetryableHttpStatus, normalizeRetryConfig } from "@composio/ao-core/utils";
+} from "@moakbal/mao-core";
+import { isRetryableHttpStatus, normalizeRetryConfig } from "@moakbal/mao-core/utils";
 
 export const manifest = {
   name: "discord",

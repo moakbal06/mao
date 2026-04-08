@@ -604,7 +604,7 @@
         </tr>
         <tr>
           <td>8</td>
-          <td><code>ao start</code> crashes for npm users — <code>@composio/ao-web</code> (dashboard) was never published</td>
+          <td><code>ao start</code> crashes for npm users — <code>@moakbal/mao-web</code> (dashboard) was never published</td>
           <td><span class="badge badge-blocking">Blocking</span></td>
           <td>Every npm user</td>
         </tr>
@@ -911,7 +911,7 @@ What's next:
       <li class="new">packages/cli/src/commands/add-project.ts</li>
     </ul>
 
-    <h3>7. Publish <code>@composio/ao-web</code> dashboard on npm</h3>
+    <h3>7. Publish <code>@moakbal/mao-web</code> dashboard on npm</h3>
 
     <p>This was the <strong>single biggest blocker</strong> for npm users. Every other AO package was published on npm, but the dashboard — the package that <code>ao start</code> needs to launch the web UI — was never published. npm users hit an immediate fatal crash.</p>
 
@@ -950,7 +950,7 @@ What's next:
           <td>5</td>
           <td>Cross-boundary imports</td>
           <td><code>server/terminal-observability.ts</code> imported from <code>../src/lib/</code> — breaks when compiled</td>
-          <td>Moved <code>resolveProjectIdForSessionId</code> to <code>@composio/ao-core</code></td>
+          <td>Moved <code>resolveProjectIdForSessionId</code> to <code>@moakbal/mao-core</code></td>
         </tr>
       </tbody>
     </table>
@@ -959,15 +959,15 @@ What's next:
     <div class="before-after">
       <div class="before">
         <h4>Before</h4>
-        <pre><code>$ npm install -g @composio/agent-orchestrator
+        <pre><code>$ npm install -g @moakbal/mao
 $ ao start
-Error: Could not find @composio/ao-web package.
+Error: Could not find @moakbal/mao-web package.
 Run: pnpm install</code></pre>
         <p style="margin-top: 8px;">Fatal crash. The suggested fix (<code>pnpm install</code>) doesn't work for npm users. Complete dead end — dashboard was simply not available outside the monorepo.</p>
       </div>
       <div class="after">
         <h4>After</h4>
-        <pre><code>$ npm install -g @composio/agent-orchestrator
+        <pre><code>$ npm install -g @moakbal/mao
 $ ao start
 ✓ Dashboard starting on http://localhost:3000
 ✓ Lifecycle worker started
@@ -979,10 +979,10 @@ Next step:
     </div>
 
     <h4 style="margin-top: 20px;">Package size optimization</h4>
-    <p>The initial <code>npm pack</code> of <code>@composio/ao-web</code> was <strong>67 MB</strong> — Next.js dumps build cache, trace files, and source maps into <code>.next/</code>. We optimized the <code>files</code> field to include only what's needed at runtime:</p>
+    <p>The initial <code>npm pack</code> of <code>@moakbal/mao-web</code> was <strong>67 MB</strong> — Next.js dumps build cache, trace files, and source maps into <code>.next/</code>. We optimized the <code>files</code> field to include only what's needed at runtime:</p>
 
     <div class="bar-chart">
-      <div class="bar-chart-title">npm package size — @composio/ao-web</div>
+      <div class="bar-chart-title">npm package size — @moakbal/mao-web</div>
       <div class="bar-pair">
         <div class="bar-row">
           <div class="bar-label">Naive <code>"files": [".next"]</code></div>
@@ -1037,7 +1037,7 @@ Next step:
       <div class="flowchart-title">ao start — dev vs production detection</div>
       <div class="fc-node fc-start"><code>ao start</code></div>
       <div class="fc-arrow">&#x2193;</div>
-      <div class="fc-node fc-process">Locate <code>@composio/ao-web</code> via <code>require.resolve</code> or monorepo fallback</div>
+      <div class="fc-node fc-process">Locate <code>@moakbal/mao-web</code> via <code>require.resolve</code> or monorepo fallback</div>
       <div class="fc-arrow">&#x2193;</div>
       <div class="fc-node fc-decision"><code>server/</code> source dir exists?</div>
       <div class="fc-arrow">&#x2193;</div>
@@ -1062,15 +1062,15 @@ Next step:
     <h4 style="margin-top: 20px;">End-to-end npm user journey</h4>
     <div class="flowchart">
       <div class="flowchart-title">What happens when an npm user runs ao start</div>
-      <div class="fc-node fc-start"><code>npm install -g @composio/agent-orchestrator</code></div>
+      <div class="fc-node fc-start"><code>npm install -g @moakbal/mao</code></div>
       <div class="fc-arrow">&#x2193;</div>
-      <div class="fc-node fc-process">npm installs <code>@composio/ao-cli</code> + all plugin deps + <code>@composio/ao-web</code><br><span style="font-size: 0.75rem; color: var(--text-muted);"><code>workspace:*</code> auto-converted to real versions by pnpm publish</span></div>
+      <div class="fc-node fc-process">npm installs <code>@moakbal/mao-cli</code> + all plugin deps + <code>@moakbal/mao-web</code><br><span style="font-size: 0.75rem; color: var(--text-muted);"><code>workspace:*</code> auto-converted to real versions by pnpm publish</span></div>
       <div class="fc-arrow">&#x2193;</div>
       <div class="fc-node fc-start"><code>ao start https://github.com/org/repo</code></div>
       <div class="fc-arrow">&#x2193;</div>
       <div class="fc-node fc-process">Clone repo → auto-generate config → find free port</div>
       <div class="fc-arrow">&#x2193;</div>
-      <div class="fc-node fc-process"><code>findWebDir()</code> resolves <code>@composio/ao-web</code> from <code>node_modules</code></div>
+      <div class="fc-node fc-process"><code>findWebDir()</code> resolves <code>@moakbal/mao-web</code> from <code>node_modules</code></div>
       <div class="fc-arrow">&#x2193;</div>
       <div class="fc-node fc-decision"><code>server/</code> exists?</div>
       <div class="fc-arrow">&#x2193;</div>
@@ -1111,22 +1111,22 @@ Next step:
       <li>packages/web/server/direct-terminal-ws.ts — dynamic <code>node-pty</code> import with graceful fallback</li>
       <li>packages/cli/src/commands/start.ts — dev vs production mode detection</li>
       <li>packages/cli/src/lib/web-dir.ts — <code>findWebDir()</code> throws with install-specific guidance</li>
-      <li>packages/cli/package.json — added <code>@composio/ao-web</code> dependency</li>
+      <li>packages/cli/package.json — added <code>@moakbal/mao-web</code> dependency</li>
       <li>.changeset/config.json — removed from ignore, added to linked</li>
       <li>packages/core/src/utils.ts — moved <code>resolveProjectIdForSessionId</code> here</li>
-      <li>packages/web/server/terminal-observability.ts — updated import to use <code>@composio/ao-core</code></li>
-      <li>packages/web/src/lib/observability.ts — updated import to use <code>@composio/ao-core</code></li>
+      <li>packages/web/server/terminal-observability.ts — updated import to use <code>@moakbal/mao-core</code></li>
+      <li>packages/web/src/lib/observability.ts — updated import to use <code>@moakbal/mao-core</code></li>
     </ul>
 
     <h3>8. Add EACCES permission guidance for npm users</h3>
     <div class="before-after">
       <div class="before">
         <h4>Before</h4>
-        <p><code>npm install -g @composio/agent-orchestrator</code> fails with EACCES on macOS default Node installs. User gets a wall of error text with no actionable fix.</p>
+        <p><code>npm install -g @moakbal/mao</code> fails with EACCES on macOS default Node installs. User gets a wall of error text with no actionable fix.</p>
       </div>
       <div class="after">
         <h4>After</h4>
-        <p>README and SETUP.md document 3 options: <code>sudo npm install -g</code> (quick fix), <code>npx @composio/agent-orchestrator</code> (no install), or fix the npm prefix directory (permanent). npm is now listed as Option A (recommended) in README.</p>
+        <p>README and SETUP.md document 3 options: <code>sudo npm install -g</code> (quick fix), <code>npx @moakbal/mao</code> (no install), or fix the npm prefix directory (permanent). npm is now listed as Option A (recommended) in README.</p>
       </div>
     </div>
     <ul class="files-changed">
@@ -1153,7 +1153,7 @@ Next step:
     <div class="before-after">
       <div class="before">
         <h4>Before</h4>
-        <p><code>findWebDir()</code> silently returned a nonexistent path when all resolution methods failed. The caller then showed <em>"Could not find @composio/ao-web. Run: pnpm install"</em> — wrong advice for npm users.</p>
+        <p><code>findWebDir()</code> silently returned a nonexistent path when all resolution methods failed. The caller then showed <em>"Could not find @moakbal/mao-web. Run: pnpm install"</em> — wrong advice for npm users.</p>
       </div>
       <div class="after">
         <h4>After</h4>
@@ -1274,7 +1274,7 @@ Next step:
         <h4 style="color: var(--green);">After (under 1 min, fully guided)</h4>
         <div class="flow-step">
           <div class="num">1</div>
-          <div><code>npm install -g @composio/agent-orchestrator</code><br><span class="comment" style="color: var(--green);">One command, no clone needed</span></div>
+          <div><code>npm install -g @moakbal/mao</code><br><span class="comment" style="color: var(--green);">One command, no clone needed</span></div>
         </div>
         <div class="flow-step">
           <div class="num">2</div>
@@ -1433,7 +1433,7 @@ Next step:
         <tr><td>Adding a second project</td><td>Manual YAML editing</td><td><code>ao add-project &lt;path&gt;</code></td></tr>
         <tr><td>Dead CLI flags</td><td><code>--smart</code> shows "coming soon"</td><td>Removed</td></tr>
         <tr><td>"What's next" guidance</td><td>None — user guesses</td><td>Every command prints the next step + directory</td></tr>
-        <tr><td>Dashboard for npm users</td><td>Fatal crash (<code>@composio/ao-web</code> not published)</td><td>Published + production entry point</td></tr>
+        <tr><td>Dashboard for npm users</td><td>Fatal crash (<code>@moakbal/mao-web</code> not published)</td><td>Published + production entry point</td></tr>
         <tr><td>Dashboard startup speed (npm)</td><td><code>npx next start</code> (slow global lookup)</td><td>Direct <code>node_modules/.bin/next</code> binary</td></tr>
         <tr><td>Error messages for missing packages</td><td>Generic "Run: pnpm install" for all users</td><td>Install-specific guidance (npm vs source)</td></tr>
         <tr><td>CI reliability</td><td>Scripts exit 0 on <code>npm link</code> failure</td><td>Non-interactive failures exit 1</td></tr>
@@ -1454,8 +1454,8 @@ Next step:
 
     <h2>Related Issues</h2>
     <p>
-      <a href="https://github.com/ComposioHQ/agent-orchestrator/issues/454">#454</a> — Codex plugin stability improvements (spawned as a parallel agent session)<br>
-      <a href="https://github.com/ComposioHQ/agent-orchestrator/issues/456">#456</a> — Dashboard shows orchestrator as "Exited" due to startup race condition
+      <a href="https://github.com/moakbal06/mao/issues/454">#454</a> — Codex plugin stability improvements (spawned as a parallel agent session)<br>
+      <a href="https://github.com/moakbal06/mao/issues/456">#456</a> — Dashboard shows orchestrator as "Exited" due to startup race condition
     </p>
 
     <h2>Test Plan</h2>
@@ -1472,7 +1472,7 @@ Next step:
       <li><code>ao init</code> completion → prints <code>ao start</code> with directory context</li>
       <li><code>ao start</code> completion → prints <code>ao spawn &lt;project&gt; &lt;issue&gt;</code></li>
       <li><code>ao add-project</code> completion → prints <code>ao start</code> and <code>ao spawn</code></li>
-      <li><code>npm install -g @composio/agent-orchestrator</code> → <code>ao start</code> finds and launches dashboard (no "Could not find @composio/ao-web" error)</li>
+      <li><code>npm install -g @moakbal/mao</code> → <code>ao start</code> finds and launches dashboard (no "Could not find @moakbal/mao-web" error)</li>
       <li>npm-installed <code>ao start</code> launches via <code>dist-server/start-all.js</code> (production mode), not <code>pnpm run dev</code></li>
       <li>Dashboard package size is under 5 MB on npm (no <code>.next/cache</code> bloat)</li>
       <li>Direct terminal gracefully degrades when <code>node-pty</code> is unavailable</li>

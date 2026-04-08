@@ -1,4 +1,4 @@
-import type { ActivityState } from "@composio/ao-core/types";
+import type { ActivityState } from "@moakbal/mao-core/types";
 
 /** Emoji indicators for each activity state, shared across components. */
 export const activityIcon: Record<ActivityState, string> = {

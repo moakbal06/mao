@@ -4,7 +4,7 @@
  * No hardcoded binary paths — relies entirely on each plugin's detect() export.
  */
 
-import type { PluginModule } from "@composio/ao-core";
+import type { PluginModule } from "@moakbal/mao-core";
 import { isHumanCaller } from "./caller-context.js";
 import { promptSelect } from "./prompts.js";
 
@@ -15,10 +15,10 @@ export interface DetectedAgent {
 
 /** Known agent plugins — package name mapping. */
 const AGENT_PLUGINS: Array<{ name: string; pkg: string }> = [
-  { name: "claude-code", pkg: "@composio/ao-plugin-agent-claude-code" },
-  { name: "aider", pkg: "@composio/ao-plugin-agent-aider" },
-  { name: "codex", pkg: "@composio/ao-plugin-agent-codex" },
-  { name: "opencode", pkg: "@composio/ao-plugin-agent-opencode" },
+  { name: "claude-code", pkg: "@moakbal/mao-plugin-agent-claude-code" },
+  { name: "aider", pkg: "@moakbal/mao-plugin-agent-aider" },
+  { name: "codex", pkg: "@moakbal/mao-plugin-agent-codex" },
+  { name: "opencode", pkg: "@moakbal/mao-plugin-agent-opencode" },
 ];
 
 /**

@@ -1,8 +1,8 @@
-# @composio/ao-plugin-tracker-github
+# @moakbal/mao-plugin-tracker-github
 
 ## 0.2.0
 
 ### Patch Changes
 
 - Updated dependencies [3a650b0]
-  - @composio/ao-core@0.2.0
+  - @moakbal/mao-core@0.2.0

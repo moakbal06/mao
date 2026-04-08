@@ -1,6 +1,6 @@
 import type { Command } from "commander";
 import chalk from "chalk";
-import { createCorrelationId, createProjectObserver, loadConfig } from "@composio/ao-core";
+import { createCorrelationId, createProjectObserver, loadConfig } from "@moakbal/mao-core";
 import { getLifecycleManager } from "../lib/create-session-manager.js";
 import {
   clearLifecycleWorkerPid,

@@ -19,7 +19,7 @@ import {
   SessionNotFoundError,
   getSessionsDir,
   getProjectBaseDir,
-} from "@composio/ao-core";
+} from "@moakbal/mao-core";
 
 const {
   mockTmux,
@@ -87,9 +87,9 @@ vi.mock("../../src/lib/shell.js", () => ({
   },
 }));
 
-vi.mock("@composio/ao-core", async (importOriginal) => {
+vi.mock("@moakbal/mao-core", async (importOriginal) => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  const actual = await importOriginal<typeof import("@composio/ao-core")>();
+  const actual = await importOriginal<typeof import("@moakbal/mao-core")>();
   return {
     ...actual,
     loadConfig: () => mockConfigRef.current,

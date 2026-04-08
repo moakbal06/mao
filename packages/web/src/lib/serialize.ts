@@ -15,7 +15,7 @@ import {
   type ProjectConfig,
   type OrchestratorConfig,
   type PluginRegistry,
-} from "@composio/ao-core";
+} from "@moakbal/mao-core";
 import type {
   DashboardSession,
   DashboardPR,

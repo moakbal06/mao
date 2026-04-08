@@ -5,7 +5,7 @@ import {
   type PluginModule,
   type Terminal,
   type Session,
-} from "@composio/ao-core";
+} from "@moakbal/mao-core";
 
 export const manifest = {
   name: "iterm2",
@@ -15,7 +15,7 @@ export const manifest = {
 };
 
 // Re-export for backwards compatibility
-export { escapeAppleScript } from "@composio/ao-core";
+export { escapeAppleScript } from "@moakbal/mao-core";
 
 /**
  * Run an AppleScript snippet and return stdout.

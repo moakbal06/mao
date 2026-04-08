@@ -1,8 +1,8 @@
-# @composio/ao-plugin-tracker-linear
+# @moakbal/mao-plugin-tracker-linear
 
 ## 0.2.0
 
 ### Patch Changes
 
 - Updated dependencies [3a650b0]
-  - @composio/ao-core@0.2.0
+  - @moakbal/mao-core@0.2.0

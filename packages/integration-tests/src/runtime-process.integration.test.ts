@@ -1,6 +1,6 @@
 import { afterAll, describe, expect, it } from "vitest";
-import processPlugin from "@composio/ao-plugin-runtime-process";
-import type { RuntimeHandle } from "@composio/ao-core";
+import processPlugin from "@moakbal/mao-plugin-runtime-process";
+import type { RuntimeHandle } from "@moakbal/mao-core";
 import { sleep } from "./helpers/polling.js";
 
 describe("runtime-process (integration)", () => {
