@@ -1494,19 +1494,39 @@ export function registerStart(program: Command): void {
             } catch (err) {
               if (err instanceof ConfigNotFoundError) {
                 const env = await detectEnvironment(cwd());
-                if (!env.isGitRepo && IS_TTY) {
-                  const shouldClone = await promptConfirm(
-                    "This directory isn't a git repo. Clone a repo here?",
-                    true,
-                  );
-                  if (shouldClone) {
-                    const repoUrl = await promptRepoUrl();
-                    const result = await handleUrlStart(repoUrl);
-                    config = result.config;
-                    ({ projectId, project } = await resolveProjectByRepo(config, result.parsed));
-                    projectResolved = true;
+                if (IS_TTY) {
+                  if (!env.isGitRepo) {
+                    const shouldClone = await promptConfirm(
+                      "This directory isn't a git repo. Clone a repo here?",
+                      true,
+                    );
+                    if (shouldClone) {
+                      const repoUrl = await promptRepoUrl();
+                      const result = await handleUrlStart(repoUrl);
+                      config = result.config;
+                      ({ projectId, project } = await resolveProjectByRepo(config, result.parsed));
+                      projectResolved = true;
+                    } else {
+                      loadedConfig = await autoCreateConfig(cwd());
+                    }
                   } else {
-                    loadedConfig = await autoCreateConfig(cwd());
+                    const choice = await promptSelect(
+                      "No config found. What do you want to do?",
+                      [
+                        { value: "current", label: "Use current repo", hint: "Auto-generate config here" },
+                        { value: "clone", label: "Clone another repo here", hint: "Provide a URL" },
+                      ],
+                      "current",
+                    );
+                    if (choice === "clone") {
+                      const repoUrl = await promptRepoUrl();
+                      const result = await handleUrlStart(repoUrl);
+                      config = result.config;
+                      ({ projectId, project } = await resolveProjectByRepo(config, result.parsed));
+                      projectResolved = true;
+                    } else {
+                      loadedConfig = await autoCreateConfig(cwd());
+                    }
                   }
                 } else {
                   // First run — auto-create config
