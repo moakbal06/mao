@@ -11,6 +11,7 @@
  */
 
 import { randomUUID } from "node:crypto";
+import { existsSync } from "node:fs";
 import {
   SESSION_STATUS,
   PR_STATE,
@@ -28,6 +29,7 @@ import {
   type PluginRegistry,
   type Runtime,
   type Agent,
+  type Workspace,
   type SCM,
   type Notifier,
   type Session,
@@ -1303,7 +1305,43 @@ export function createLifecycleManager(deps: LifecycleManagerDeps): LifecycleMan
       const sessions = await sessionManager.list(scopedProjectId);
 
       // --- Native Autonomous Tracker Polling ---
-      const activeIssueIds = new Set(sessions.map(s => `${s.projectId}:${s.issueId}`));
+      const activeIssueIds = new Set<string>();
+      for (const session of sessions) {
+        if (!session.issueId) continue;
+        if (TERMINAL_STATUSES.has(session.status)) continue;
+
+        const project = config.projects[session.projectId];
+        if (!project) continue;
+        const workspacePath = session.workspacePath;
+        if (!workspacePath) {
+          activeIssueIds.add(`${session.projectId}:${session.issueId}`);
+          continue;
+        }
+
+        const workspacePluginName = project.workspace ?? config.defaults.workspace;
+        const workspacePlugin = registry.get<Workspace>("workspace", workspacePluginName);
+
+        let workspaceUsable = true;
+        if (workspacePlugin?.exists) {
+          try {
+            workspaceUsable = await workspacePlugin.exists(workspacePath);
+          } catch {
+            workspaceUsable = false;
+          }
+        } else {
+          workspaceUsable = existsSync(workspacePath);
+        }
+
+        if (!workspaceUsable) {
+          console.warn(
+            `[LifecycleManager] Skipping stale session ${session.id} for issue tracking: workspace is unavailable (${workspacePath})`,
+          );
+          continue;
+        }
+
+        activeIssueIds.add(`${session.projectId}:${session.issueId}`);
+      }
+
       for (const [projectId, project] of Object.entries(config.projects)) {
         if (scopedProjectId && scopedProjectId !== projectId) continue;
         const trackerName = project.tracker?.plugin || config.defaults.tracker;
