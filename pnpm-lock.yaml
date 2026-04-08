@@ -615,6 +615,9 @@ importers:
       '@moakbal/mao-plugin-tracker-github':
         specifier: workspace:*
         version: link:../plugins/tracker-github
+      '@moakbal/mao-plugin-tracker-jira':
+        specifier: workspace:*
+        version: link:../plugins/tracker-jira
       '@moakbal/mao-plugin-tracker-linear':
         specifier: workspace:*
         version: link:../plugins/tracker-linear

@@ -11,7 +11,7 @@
 
 import { spawn, type ChildProcess } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { resolve, basename } from "node:path";
+import { resolve, basename, sep } from "node:path";
 import { cwd } from "node:process";
 import chalk from "chalk";
 import ora from "ora";
@@ -72,6 +72,46 @@ const IS_TTY = Boolean(process.stdin.isTTY && process.stdout.isTTY);
 // =============================================================================
 // HELPERS
 // =============================================================================
+
+function isSourceCheckout(webDir: string): boolean {
+  return !webDir.split(sep).includes("node_modules");
+}
+
+async function ensureLocalWorkspaceReady(webDir: string): Promise<void> {
+  if (!isHumanCaller() || !IS_TTY) return;
+  if (!isSourceCheckout(webDir)) return;
+
+  const repoRoot = resolve(webDir, "..", "..");
+  const workspaceFile = resolve(repoRoot, "pnpm-workspace.yaml");
+  if (!existsSync(workspaceFile)) return;
+
+  const nodeModulesDir = resolve(repoRoot, "node_modules");
+  const coreDist = resolve(repoRoot, "packages", "core", "dist", "index.js");
+  const needsInstall = !existsSync(nodeModulesDir);
+  const needsBuild = !existsSync(coreDist);
+
+  if (!needsInstall && !needsBuild) return;
+
+  console.log(chalk.dim("\nSetting up local workspace dependencies..."));
+
+  try {
+    if (needsInstall) {
+      console.log(chalk.dim("  • pnpm install"));
+      await exec("pnpm", ["install"], { cwd: repoRoot });
+    }
+    if (needsBuild) {
+      console.log(chalk.dim("  • pnpm build"));
+      await exec("pnpm", ["build"], { cwd: repoRoot });
+    }
+  } catch (err) {
+    throw new Error(
+      `Failed to prepare local workspace. ${err instanceof Error ? err.message : String(err)}`,
+      { cause: err instanceof Error ? err : undefined },
+    );
+  }
+
+  console.log(chalk.dim("  ✓ Workspace ready\n"));
+}
 
 /**
  * Resolve project from config.
@@ -1096,6 +1136,7 @@ async function runStartup(
       port = newPort;
     }
     const webDir = findWebDir(); // throws with install-specific guidance if not found
+    await ensureLocalWorkspaceReady(webDir);
     await preflight.checkBuilt(webDir);
 
     if (opts?.rebuild) {

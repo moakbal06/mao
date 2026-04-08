@@ -32,7 +32,7 @@ async function checkPort(port: number): Promise<void> {
  * installs (hoisted to a parent node_modules).
  */
 async function checkBuilt(webDir: string): Promise<void> {
-  const corePkgDir = findPackageUp(webDir, "@composio", "ao-core");
+  const corePkgDir = findPackageUp(webDir, "@moakbal", "mao-core");
   if (!corePkgDir) {
     const hint = webDir.includes("node_modules")
       ? "Run: npm install -g @moakbal/mao@latest"
