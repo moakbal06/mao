@@ -38,5 +38,6 @@ export async function promptText(message: string, placeholder?: string): Promise
     console.log(chalk.yellow("\nRequest Cancelled."));
     process.exit(0);
   }
+  if (result === undefined || result === null) return "";
   return String(result).trim();
 }

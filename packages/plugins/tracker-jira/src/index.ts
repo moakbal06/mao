@@ -44,7 +44,10 @@ function getEnv(name: string): string {
 function asNonEmptyString(value: unknown): string | undefined {
   if (typeof value !== "string") return undefined;
   const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : undefined;
+  if (trimmed.length === 0) return undefined;
+  const normalized = trimmed.toLowerCase();
+  if (normalized === "undefined" || normalized === "null") return undefined;
+  return trimmed;
 }
 
 function escapeJqlString(value: string): string {

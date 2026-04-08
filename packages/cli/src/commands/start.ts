@@ -266,6 +266,15 @@ function parseEnvKeys(content: string): Set<string> {
   return keys;
 }
 
+function normalizePromptScalar(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+  const normalized = trimmed.toLowerCase();
+  if (normalized === "undefined" || normalized === "null") return undefined;
+  return trimmed;
+}
+
 function appendMissingEnvVars(envPath: string, entries: Array<{ key: string; value: string }>): void {
   const existing = existsSync(envPath) ? parseEnvKeys(readFileSync(envPath, "utf-8")) : new Set();
   const lines: string[] = [];
@@ -296,6 +305,22 @@ async function ensureJiraConfig(
   const rawProject = rawConfig.projects[projectId] ?? {};
   const rawTracker = (rawProject.tracker ?? {}) as Record<string, unknown>;
 
+  const normalizedProjectKey = normalizePromptScalar(rawTracker.projectKey);
+  if (rawTracker.projectKey !== normalizedProjectKey) {
+    rawTracker.projectKey = normalizedProjectKey;
+    shouldWrite = true;
+  }
+  const normalizedReadyLabel = normalizePromptScalar(rawTracker.readyLabel);
+  if (rawTracker.readyLabel !== normalizedReadyLabel) {
+    rawTracker.readyLabel = normalizedReadyLabel;
+    shouldWrite = true;
+  }
+  const normalizedAssignee = normalizePromptScalar(rawTracker.assignee);
+  if (rawTracker.assignee !== normalizedAssignee) {
+    rawTracker.assignee = normalizedAssignee;
+    shouldWrite = true;
+  }
+
   if (!rawTracker.plugin) {
     rawTracker.plugin = "jira";
     shouldWrite = true;
@@ -310,7 +335,7 @@ async function ensureJiraConfig(
     }
   }
 
-  if (rawTracker.plugin === "jira" && !rawTracker.projectKey) {
+  if (rawTracker.plugin === "jira" && !normalizePromptScalar(rawTracker.projectKey)) {
     const key = await promptText("Jira project key (e.g. PROJ):");
     if (key) {
       rawTracker.projectKey = key.trim().toUpperCase();
@@ -318,22 +343,22 @@ async function ensureJiraConfig(
     }
   }
 
-  if (rawTracker.plugin === "jira" && !rawTracker.readyLabel) {
+  if (rawTracker.plugin === "jira" && !normalizePromptScalar(rawTracker.readyLabel)) {
     const labelInput = await promptText(
       "Default Jira label to auto-claim (enter for ready-for-ai):",
       "ready-for-ai",
     );
-    const label = labelInput || "ready-for-ai";
+    const label = normalizePromptScalar(labelInput) ?? "ready-for-ai";
     rawTracker.readyLabel = label.trim();
     shouldWrite = true;
   }
 
-  if (rawTracker.plugin === "jira" && !rawTracker.assignee) {
+  if (rawTracker.plugin === "jira" && !normalizePromptScalar(rawTracker.assignee)) {
     const assigneeInput = await promptText(
       "Default Jira assignee filter (enter for currentUser()):",
       "currentUser()",
     );
-    const assignee = assigneeInput || "currentUser()";
+    const assignee = normalizePromptScalar(assigneeInput) ?? "currentUser()";
     rawTracker.assignee = assignee.trim();
     shouldWrite = true;
   }
